@@ -10,7 +10,20 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
-VERSION_ESQUEMA = "1.0.0"
+VERSION_ESQUEMA = "1.1.0"
+
+# Cobertura medida sobre los 267 llamados unicos del corpus (5 ediciones de
+# junio a agosto de 2026). Los pesos y los flags `obligatorio` de abajo salen
+# de esta tabla, no de una intuicion:
+#
+#   campo             todos   COMPR.AR (143)   formato libre (124)
+#   expediente          74%        99%               45%
+#   fecha_apertura      84%        89%               79%
+#   monto_estimado      15%         3%               28%
+#   valor_pliego        13%         0%               28%
+#
+# Para reproducirla: contar las apariciones sobre data/interim/*.txt filtrando
+# por tipo == "llamado" en indice.json.
 
 TipoCampo = Literal["texto", "monto", "fecha", "entero", "codigo"]
 
@@ -39,6 +52,10 @@ CAMPOS: tuple[Campo, ...] = (
         "codigo",
         "Numero de expediente o actuacion. Formato variable segun organismo.",
         peso=2.0,
+        # Presente en el 74%: en COMPR.AR practicamente siempre, en formato
+        # libre menos de la mitad de las veces. Sigue pesando 2.0 porque cuando
+        # esta, errarlo invalida el registro.
+        obligatorio=False,
     ),
     Campo(
         "tipo_procedimiento",
@@ -62,7 +79,13 @@ CAMPOS: tuple[Campo, ...] = (
         "monto_estimado",
         "monto",
         "Presupuesto oficial o monto estimado en pesos. None si el aviso no lo trae.",
-        peso=2.0,
+        # Bajado de 2.0 a 0.5. Solo el 15% de los avisos trae monto, asi que en
+        # el 85% de los casos la respuesta correcta es null: con peso 2.0 este
+        # campo medía prudencia, no capacidad de extraccion, y un modelo que
+        # contestara null siempre ganaba en el campo mas pesado del esquema.
+        # Lo que este campo si mide bien es la alucinacion, y eso se reporta
+        # aparte en evaluar.py.
+        peso=0.5,
         obligatorio=False,
     ),
     Campo(
@@ -70,11 +93,15 @@ CAMPOS: tuple[Campo, ...] = (
         "fecha",
         "Fecha y hora de apertura de ofertas, en ISO 8601.",
         peso=2.0,
+        # Presente en el 84%. Mantiene peso alto: es el dato por el que alguien
+        # lee un aviso de licitacion, y una fecha mal cargada hace perder el llamado.
+        obligatorio=False,
     ),
     Campo(
         "valor_pliego",
         "monto",
         "Valor del pliego. None si es gratuito o no se menciona.",
+        # Presente en el 13%. Ya pesaba poco, se mantiene.
         peso=0.5,
         obligatorio=False,
     ),

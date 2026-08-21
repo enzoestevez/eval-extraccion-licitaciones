@@ -35,8 +35,23 @@ from normalizar import normalizar  # noqa: E402
 RAIZ = Path(__file__).resolve().parent.parent
 INTERMEDIO = RAIZ / "data" / "interim"
 ORO = RAIZ / "data" / "gold" / "etiquetas.jsonl"
+INDICE = INTERMEDIO / "indice.json"
 
 ANCHO = 78
+
+
+def ids_llamados() -> set[str] | None:
+    """Solo los avisos de convocatoria.
+
+    Las adjudicaciones y preadjudicaciones son avisos de RESULTADO: no tienen
+    fecha de apertura ni valor de pliego, y la mitad de los campos del esquema
+    no les aplica. Etiquetarlas mezcla dos tareas distintas y ensucia la metrica.
+    Quedan fuera del set y eso va declarado en el README.
+    """
+    if not INDICE.exists():
+        return None
+    idx = json.loads(INDICE.read_text(encoding="utf-8"))
+    return {r["id"] for r in idx if r.get("tipo") == "llamado"}
 
 
 def cargar() -> dict[str, dict]:
@@ -138,11 +153,29 @@ def main() -> None:
     ap.add_argument("--id", help="etiquetar un documento puntual")
     ap.add_argument("--revisar", action="store_true", help="repasar los ya etiquetados")
     ap.add_argument("--estado", action="store_true")
+    ap.add_argument(
+        "--todos-los-tipos",
+        action="store_true",
+        help="incluir adjudicaciones y preadjudicaciones (por defecto se excluyen)",
+    )
     args = ap.parse_args()
 
     docs = sorted(INTERMEDIO.glob("*.txt"))
     if not docs:
-        sys.exit(f"No hay textos en {INTERMEDIO}. Corre src/ingesta.py primero.")
+        sys.exit(f"No hay textos en {INTERMEDIO}. Corre src/dividir.py primero.")
+
+    if not args.todos_los_tipos:
+        llamados = ids_llamados()
+        if llamados is None:
+            print("Aviso: no encontre indice.json, no puedo filtrar por tipo.")
+        else:
+            antes = len(docs)
+            docs = [p for p in docs if p.stem in llamados]
+            if antes != len(docs):
+                print(
+                    f"Filtrados {antes - len(docs)} avisos de resultado "
+                    "(adjudicaciones/preadjudicaciones). Con --todos-los-tipos se incluyen."
+                )
 
     registros = cargar()
     if args.estado:

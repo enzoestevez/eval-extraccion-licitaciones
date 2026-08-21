@@ -49,10 +49,11 @@ Ver [`reports/RESULTADOS.md`](reports/RESULTADOS.md) — se genera solo.
 ## Arquitectura
 
 ```
-PDFs (data/raw)
+Boletines diarios (data/raw/*.pdf)   ~68 avisos por edición
    │
-   ├─ src/ingesta.py ──────────► texto plano (data/interim/*.txt)
-   │                              + detección de escaneados
+   ├─ src/dividir.py ──────────► un .txt por aviso (data/interim/*.txt)
+   │                              + data/interim/indice.json con rubro,
+   │                                tipo (llamado/adjudicación) y formato
    │
    ├─ label/etiquetar.py ──────► set de referencia (data/gold/etiquetas.jsonl)
    │                              etiquetado a mano, protocolo versionado
@@ -76,7 +77,7 @@ python -m venv .venv && source .venv/bin/activate   # en Windows: .venv\Scripts\
 pip install -r requirements.txt
 
 # 1. Probá el pipeline entero sin gastar un peso ni tener API key.
-python src/ingesta.py
+python src/dividir.py                # boletines diarios -> un .txt por aviso
 python label/etiquetar.py            # etiquetá 3 o 4 para probar
 python src/extraer.py --variante v0-base
 python src/evaluar.py
@@ -94,12 +95,49 @@ python src/evaluar.py && python src/reporte.py
 
 Avisos de la Tercera Sección (Contrataciones) del
 [Boletín Oficial de la República Argentina](https://www.boletinoficial.gob.ar/).
+Cada edición diaria es un solo PDF con todos los avisos del día adentro —
+alrededor de 68 en la edición del 3/8/2026— así que el corpus se arma bajando
+unas 5 ediciones, no 300 archivos.
+
 Los PDFs no están versionados en el repo (`data/raw/` está en `.gitignore`): son
 pesados y se pueden volver a bajar. Lo que sí está versionado es el set etiquetado,
 que es el activo real del proyecto.
 
-Descarga: `COMPLETAR` — anotá acá cómo los bajaste (script, rango de fechas,
-cuántos), para que sea reproducible.
+Descarga: 5 ediciones de la Tercera Sección — **1/6, 19/6, 1/7, 20/7 y 3/8 de
+2026**— bajadas a mano desde el sitio del Boletín Oficial. Dieron **300 avisos en
+bruto y 296 únicos**, de los cuales **267 son llamados** (el resto,
+adjudicaciones y preadjudicaciones, quedan fuera del set).
+
+### Por qué las fechas están espaciadas
+
+Un aviso no se publica un día: se publica durante varios días seguidos, y el pie
+lo dice (`e. 31/07/2026 ... v. 03/08/2026`). Un primer intento con **cinco
+ediciones consecutivas** dio 304 avisos de los cuales **el 38% eran
+republicaciones del mismo aviso**. Sin deduplicar, el modelo habría visto el
+mismo documento hasta cuatro veces y cada acierto o error se habría contado de
+nuevo: la precisión reportada habría estado inflada.
+
+Con **fechas espaciadas** el solapamiento cayó al **1%**. `src/dividir.py`
+deduplica igual por número de aviso, pero el diseño del muestreo es lo que hace
+que el corpus sea realmente diverso y no cinco fotos del mismo día.
+
+### Cómo se corta cada edición
+
+Cada aviso termina con su pie de publicación —
+`e. 31/07/2026 N° 53047/26 v. 03/08/2026`— que aparece exactamente una vez por
+aviso y trae su identificador. Ese pie es el delimitador. `src/dividir.py` además
+clasifica cada aviso por rubro, por tipo (llamado / preadjudicación / adjudicación)
+y por formato:
+
+- **`comprar`**: los que publica el sistema COMPR.AR, con campos etiquetados
+  (`UOC:`, `Expediente N°:`, `Objeto:`). Homogéneos y fáciles.
+- **`libre`**: los que cada organismo redacta a su manera —universidades, BCRA,
+  Ministerio Público, banca multilateral—. Prosa corrida, campos en mayúsculas o
+  directamente ausentes.
+
+Esa distinción importa: reportar el resultado por segmento dice mucho más que un
+promedio único. `COMPLETAR`% en formato COMPR.AR contra `COMPLETAR`% en formato
+libre es un hallazgo; el promedio de los dos esconde justamente dónde falla.
 
 ## Lo que no resuelve
 
@@ -107,10 +145,18 @@ cuántos), para que sea reproducible.
 casi nadie escribe. Un proyecto que documenta sus propios límites se lee como
 trabajo profesional; uno que sólo muestra el número bueno se lee como demo.)*
 
-- PDFs escaneados sin capa de texto: quedan fuera del corpus, marcados en
-  `data/interim/indice.json`. Requerirían OCR y un experimento aparte, porque
-  mezclarlos confunde el error del modelo con el error del OCR.
-- `COMPLETAR`
+- **Adjudicaciones y preadjudicaciones** (29 de los 296 avisos del corpus) quedan
+  fuera. Son avisos de *resultado*, no de convocatoria: no tienen fecha de
+  apertura ni valor de pliego, y la mitad del esquema no les aplica. Meterlas
+  mezclaría dos tareas de extracción distintas bajo una sola métrica. Extraer de
+  ellas es un proyecto aparte, con su propio esquema.
+- **PDFs escaneados sin capa de texto.** Las cinco ediciones de este corpus traen
+  texto, pero si apareciera una escaneada `src/dividir.py` la detecta y avisa.
+  Requeriría OCR y un experimento aparte: mezclarlos confunde el error del modelo
+  con el error del OCR.
+- **Avisos de más de 60.000 caracteres.** `src/extraer.py` los corta. Ninguno del
+  corpus actual se acerca (el más largo tiene 4.220), pero el límite existe y hay
+  que declararlo.
 - `COMPLETAR`
 
 ## Consistencia del propio set de referencia
@@ -130,4 +176,14 @@ convierte en tus respuestas de entrevista.)*
 - **`valor_pliego` distingue `0` de `null`.** "El pliego es gratuito" y "el aviso
   no menciona el pliego" son hechos distintos. Meterlos en la misma bolsa
   entrenaría al sistema a rellenar huecos.
+- **`monto_estimado` bajó de peso 2.0 a 0.5** después de medir la cobertura sobre
+  los 267 llamados: sólo el 15% de los avisos trae monto, así que en el 85% de
+  los casos la respuesta correcta es `null`. Con peso 2.0, un modelo que
+  contestara `null` siempre ganaba en el campo más pesado del esquema — o sea que
+  ese campo medía prudencia, no capacidad de extracción. Lo que sí mide bien es la
+  alucinación, y eso se reporta en su propia línea.
+- **Los pesos salen de una tabla de cobertura medida**, no de una intuición. Está
+  en el encabezado de `src/esquema.py` con el método para reproducirla.
+- **El corpus se muestrea con fechas espaciadas**, por la republicación de avisos.
+  Ver arriba: es la diferencia entre 38% y 1% de duplicados.
 - `COMPLETAR`
