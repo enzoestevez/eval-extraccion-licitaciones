@@ -1,0 +1,18 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Los PDFs crudos no van al repo: son pesados y se pueden volver a bajar.
+data/raw/*
+!data/raw/.gitkeep
+
+# El texto extraido tampoco: es derivado.
+data/interim/*
+!data/interim/.gitkeep
+
+# El set etiquetado SI va al repo. Es el activo del proyecto.
+!data/gold/etiquetas.jsonl
+
+.DS_Store

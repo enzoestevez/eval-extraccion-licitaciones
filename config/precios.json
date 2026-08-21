@@ -1,0 +1,10 @@
+{
+  "_nota": "Precios en USD por millon de tokens. Completalos vos desde la pagina de precios de cada proveedor y anota la fecha de consulta en el README. No hay valores por defecto a proposito: un precio inventado en tu reporte es peor que no tener el numero.",
+  "_consultado_el": "COMPLETAR (AAAA-MM-DD)",
+
+  "v1-minimo": { "usd_por_millon_in": null, "usd_por_millon_out": null },
+  "v2-reglas": { "usd_por_millon_in": null, "usd_por_millon_out": null },
+  "v3-ejemplos": { "usd_por_millon_in": null, "usd_por_millon_out": null },
+  "v4-modelo-caro": { "usd_por_millon_in": null, "usd_por_millon_out": null },
+  "v5-otro-proveedor": { "usd_por_millon_in": null, "usd_por_millon_out": null }
+}
