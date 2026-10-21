@@ -112,6 +112,80 @@ def main() -> None:
     # La ganadora sale SOLO de las variantes con cobertura completa.
     ganadora = completas[0]
 
+    # --- por formato: el hallazgo central del proyecto ---------------------
+    # Un promedio unico no se puede interpretar, porque cada formato tiene su
+    # propio techo humano medido por doble ciego. Esta tabla pone cada numero al
+    # lado del techo que le corresponde.
+    TECHO = {"comprar": 0.987, "libre": 0.727}
+    NOMBRE = {"comprar": "COMPR.AR", "libre": "formato libre"}
+    if any(v.get("por_formato") for v in vs):
+        L.append("## El promedio unico no sirve: hay que partir por formato\n")
+        L.append(
+            "El doble ciego midio el techo del experimento —la consistencia de una "
+            "persona etiquetando dos veces a ciegas— en **98,7% para COMPR.AR** y "
+            "**72,7% para formato libre**. Son dos problemas distintos, y comparar "
+            "un modelo contra un techo que no le corresponde no dice nada.\n"
+        )
+        for f in ("comprar", "libre"):
+            filas = [v for v in completas if v.get("por_formato", {}).get(f, {}).get("n")]
+            if not filas:
+                continue
+            techo = TECHO.get(f)
+            L.append(f"### {NOMBRE.get(f, f)} · techo humano {pct(techo)}\n")
+            L.append("| Variante | n | Precision | Contra el techo | Docs perfectos | Alucinacion |")
+            L.append("|---|---:|---:|---:|---:|---:|")
+            for v in sorted(filas, key=lambda x: -x["por_formato"][f]["precision"]):
+                d = v["por_formato"][f]
+                # Un "+5,2" para algo que esta DEBAJO del techo se lee al revés.
+                # La columna dice cuanto falta, o dice que ya no falta nada.
+                if not techo:
+                    brecha = "—"
+                elif techo - d["precision"] <= 0.005:
+                    brecha = "**en el techo**"
+                else:
+                    brecha = f"−{(techo - d['precision']) * 100:.1f} pts"
+                L.append(
+                    f"| `{v['variante']}` | {d['n']} | {pct(d['precision'])} | {brecha} | "
+                    f"{pct(d['docs_perfectos'])} | {pct(d['alucinacion'])} |"
+                )
+            L.append("")
+
+        # La lectura, calculada y no escrita a mano.
+        mejor = completas[0]
+        pf = mejor.get("por_formato", {})
+        reglas = next((v for v in completas if v["variante"] == "v0-reglas"), None)
+        if "libre" in pf and TECHO["libre"] - pf["libre"]["precision"] <= 0.01:
+            L.append(
+                f"**En formato libre el modelo ya esta en el techo humano** "
+                f"({pct(pf['libre']['precision'])} contra {pct(TECHO['libre'])}). Lo que "
+                f"queda de error no es una limitacion del modelo: es que el documento no "
+                f"trae la respuesta de forma inequivoca. Ninguna version del prompt lo va "
+                f"a mover, y eso se ve en que las variantes de prompt dan el mismo numero "
+                f"en ese formato.\n"
+            )
+        if "comprar" in pf:
+            L.append(
+                f"**En COMPR.AR queda margen real:** {pct(pf['comprar']['precision'])} "
+                f"contra un techo de {pct(TECHO['comprar'])}, "
+                f"{(TECHO['comprar'] - pf['comprar']['precision']) * 100:.1f} puntos.\n"
+            )
+        if reglas and reglas.get("por_formato"):
+            rf = reglas["por_formato"]
+            partes = []
+            for f in ("comprar", "libre"):
+                if f in rf and f in pf:
+                    partes.append(
+                        f"en {NOMBRE[f]} el extractor determinista saca "
+                        f"{pct(rf[f]['precision'])} a costo cero contra "
+                        f"{pct(pf[f]['precision'])} del modelo, "
+                        f"**{(pf[f]['precision'] - rf[f]['precision']) * 100:+.1f} puntos**"
+                    )
+            if partes:
+                L.append(
+                    "**Donde se justifica pagar por un modelo**, que es la pregunta del "
+                    "proyecto: " + "; ".join(partes) + ".\n"
+                )
+
     # --- por campo ---------------------------------------------------------
     L.append(f"## Donde se equivoca la mejor variante (`{ganadora['variante']}`)\n")
     L.append("| Campo | Peso | Precision | Acierto | Null ok | Error | Alucinacion | Omision |")

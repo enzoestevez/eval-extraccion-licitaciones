@@ -103,6 +103,47 @@ def costo_usd(variante_id: str, tin: int, tout: int) -> float | None:
     return tin / 1e6 * p["usd_por_millon_in"] + tout / 1e6 * p["usd_por_millon_out"]
 
 
+# FORMATO DEL AVISO. Es la variable que mas explica de este proyecto y por eso
+# no puede quedar escondida dentro de un promedio.
+#
+# El doble ciego midio el techo HUMANO en 98,7% para los avisos con formato
+# COMPR.AR y 72,7% para los de formato libre. Un promedio unico de precision del
+# modelo mezcla la mitad facil con la mitad donde ni una persona pasa del 73%, y
+# despues no se puede decir si el modelo anda bien o mal: se lo esta comparando
+# contra un techo que no existe.
+#
+# Por eso cada variante reporta tambien `por_formato`, y cada numero va al lado
+# de su propio techo.
+_FORMATOS: dict[str, str] | None = None
+
+
+def formato_de(doc_id: str) -> str:
+    global _FORMATOS
+    if _FORMATOS is None:
+        ruta = INTERMEDIO / "indice.json"
+        if ruta.exists():
+            _FORMATOS = {r["id"]: r.get("formato", "?")
+                         for r in json.loads(ruta.read_text(encoding="utf-8"))}
+        else:
+            _FORMATOS = {}
+    return _FORMATOS.get(doc_id, "?")
+
+
+def resumen(docs: list[dict], n_campos: int) -> dict:
+    """Metricas de un subconjunto de documentos ya evaluados."""
+    if not docs:
+        return {"n": 0, "precision": None, "docs_perfectos": None}
+    n = len(docs)
+    return {
+        "n": n,
+        "precision": round(sum(d["puntaje"] for d in docs) / n, 4),
+        "docs_perfectos": round(sum(d["exacto"] for d in docs) / n, 4),
+        "alucinacion": round(
+            sum(1 for d in docs for v in d["detalle"].values() if v == "alucinacion")
+            / (n * n_campos), 4),
+    }
+
+
 def evaluar_variante(variante_id: str, oro: dict[str, dict]) -> dict | None:
     pred = cargar_jsonl(INTERMEDIO / f"pred_{variante_id}.jsonl")
     comunes = sorted(set(oro) & set(pred))
@@ -142,6 +183,7 @@ def evaluar_variante(variante_id: str, oro: dict[str, dict]) -> dict | None:
                 "puntaje": round(puntaje_doc, 4),
                 "exacto": exacto,
                 "confianza": datos_p.get("confianza", 0.0) or 0.0,
+                "formato": formato_de(doc_id),
                 "detalle": detalle,
             }
         )
@@ -187,6 +229,13 @@ def evaluar_variante(variante_id: str, oro: dict[str, dict]) -> dict | None:
             for c in CAMPOS
         },
         "curva_umbral": curva_umbral(por_doc),
+        # Cada formato con su propio n: el techo humano es distinto en cada uno
+        # (98,7% COMPR.AR / 72,7% libre), asi que el promedio unico no se puede
+        # interpretar sin esto.
+        "por_formato": {
+            f: resumen([d for d in por_doc if d["formato"] == f], len(CAMPOS))
+            for f in sorted({d["formato"] for d in por_doc})
+        },
         "peores": sorted(por_doc, key=lambda d: d["puntaje"])[:10],
     }
 

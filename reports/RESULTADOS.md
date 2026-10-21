@@ -21,6 +21,36 @@ Set etiquetado: **115 documentos** · esquema v1.1.0
 
 **Precision** es el promedio ponderado por campo (los pesos estan en `src/esquema.py`). **Docs perfectos** es el porcentaje de documentos sin un solo campo mal — es la metrica dura, la que importa si el registro se carga entero o no se carga. **Alucinacion** es la proporcion de campos donde el modelo puso un valor y la verdad era `null`; en produccion es el error mas caro y por eso va aparte.
 
+## El promedio unico no sirve: hay que partir por formato
+
+El doble ciego midio el techo del experimento —la consistencia de una persona etiquetando dos veces a ciegas— en **98,7% para COMPR.AR** y **72,7% para formato libre**. Son dos problemas distintos, y comparar un modelo contra un techo que no le corresponde no dice nada.
+
+### COMPR.AR · techo humano 98.7%
+
+| Variante | n | Precision | Contra el techo | Docs perfectos | Alucinacion |
+|---|---:|---:|---:|---:|---:|
+| `v3-ejemplos` | 58 | 93.5% | −5.2 pts | 56.9% | 0.0% |
+| `v1-minimo` | 58 | 93.0% | −5.7 pts | 51.7% | 0.0% |
+| `v2-reglas` | 58 | 92.7% | −6.0 pts | 50.0% | 0.0% |
+| `v0-reglas` | 58 | 89.5% | −9.2 pts | 53.4% | 0.0% |
+| `v0-base` | 58 | 12.3% | −86.4 pts | 0.0% | 0.0% |
+
+### formato libre · techo humano 72.7%
+
+| Variante | n | Precision | Contra el techo | Docs perfectos | Alucinacion |
+|---|---:|---:|---:|---:|---:|
+| `v3-ejemplos` | 57 | 73.2% | **en el techo** | 5.3% | 5.9% |
+| `v2-reglas` | 57 | 73.2% | **en el techo** | 5.3% | 5.3% |
+| `v1-minimo` | 57 | 73.2% | **en el techo** | 8.8% | 7.5% |
+| `v0-reglas` | 57 | 52.1% | −20.6 pts | 0.0% | 0.9% |
+| `v0-base` | 57 | 20.6% | −52.1 pts | 0.0% | 0.0% |
+
+**En formato libre el modelo ya esta en el techo humano** (73.2% contra 72.7%). Lo que queda de error no es una limitacion del modelo: es que el documento no trae la respuesta de forma inequivoca. Ninguna version del prompt lo va a mover, y eso se ve en que las variantes de prompt dan el mismo numero en ese formato.
+
+**En COMPR.AR queda margen real:** 93.5% contra un techo de 98.7%, 5.2 puntos.
+
+**Donde se justifica pagar por un modelo**, que es la pregunta del proyecto: en COMPR.AR el extractor determinista saca 89.5% a costo cero contra 93.5% del modelo, **+4.0 puntos**; en formato libre el extractor determinista saca 52.1% a costo cero contra 73.2% del modelo, **+21.1 puntos**.
+
 ## Donde se equivoca la mejor variante (`v3-ejemplos`)
 
 | Campo | Peso | Precision | Acierto | Null ok | Error | Alucinacion | Omision |
