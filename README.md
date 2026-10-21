@@ -1,13 +1,28 @@
 # Extracción de datos de avisos de contratación pública — banco de evaluación
 
-> **El número:** `COMPLETAR`% de precisión a nivel campo sobre un set de
-> `COMPLETAR` avisos etiquetados a mano, a `COMPLETAR` USD por documento.
-> Con umbral de confianza en `COMPLETAR`, el `COMPLETAR`% se procesa solo y el
-> resto va a revisión humana, sosteniendo `COMPLETAR`% de precisión efectiva.
-> El baseline humano es `COMPLETAR`% a `COMPLETAR` USD por documento.
+> **El número, y por qué el número no es el resultado.**
 >
-> *(Reemplazá esto por los números reales cuando corras el proyecto. Es lo único
-> que un reclutador lee con seguridad.)*
+> 83,5% de precisión ponderada por campo sobre **115 avisos etiquetados a mano**,
+> a USD 0,00075 por documento. Pero ese promedio no se puede interpretar:
+>
+> | | Precisión | Techo humano medido | |
+> |---|---:|---:|---|
+> | Formato COMPR.AR | **93,5%** | 98,7% | quedan 5,2 puntos |
+> | Formato libre | **73,2%** | 72,7% | **ya está en el techo** |
+>
+> **En la mitad difícil el modelo alcanzó la consistencia de una persona**, y
+> ninguna versión del prompt lo mueve: tres prompts distintos dan 73,2% los tres.
+> Lo que queda de error no es una limitación del modelo, es que el documento no
+> trae la respuesta.
+>
+> **Línea base humana:** 85,7% de precisión, 113 segundos y USD 0,058 por
+> documento, con el costo anclado al salario mínimo legal. El modelo es **77×
+> más barato y 29× más rápido**.
+>
+> **Línea base sin IA:** un parser de expresiones regulares saca 89,5% en
+> COMPR.AR a costo cero. El modelo sólo le gana por 4 puntos ahí, y por 21 en
+> formato libre. **Ahí está la respuesta a dónde se justifica pagar por un
+> modelo**, que es la pregunta que el proyecto se hizo.
 
 ---
 
@@ -52,7 +67,51 @@ umbral de confianza conviene dejar de revisarlo a mano?**
 
 ## Resultados
 
-Ver [`reports/RESULTADOS.md`](reports/RESULTADOS.md) — se genera solo.
+Tabla completa en [`reports/RESULTADOS.md`](reports/RESULTADOS.md) — se genera
+sola con `src/reporte.py`, desde `reports/metricas.json`.
+
+| Variante | n | Precisión | COMPR.AR | Libre | Docs perfectos | Alucinación | USD/doc |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `v3-ejemplos` | 115 | **83,5%** | 93,5% | 73,2% | 31,3% | 2,9% | 0,000751 |
+| `v1-minimo` | 115 | 83,2% | 93,0% | 73,2% | 30,4% | 3,7% | 0,000622 |
+| `v2-reglas` | 115 | 83,1% | 92,7% | 73,2% | 27,8% | 2,6% | 0,000681 |
+| `v0-reglas` *(sin IA)* | 115 | 71,0% | 89,5% | 52,1% | 27,0% | **0,4%** | **0** |
+| `v4-modelo-caro` | **53** ⚠ | 83,9% | 97,1% | 73,7% | 32,1% | 2,8% | 0,002858 |
+
+`v4-modelo-caro` está marcada porque tiene 53 de 115 documentos: su precisión
+está calculada sobre otro subconjunto y **no entra en ninguna conclusión**. El
+reporte la marca solo y elige la variante ganadora únicamente entre las que
+tienen cobertura completa.
+
+**Tres cosas que este cuadro dice y un promedio no diría:**
+
+1. **Todo el eje de ingeniería de prompt vale 0,3 puntos** (83,2% sin reglas
+   contra 83,5% con reglas y un ejemplo resuelto), y **cero** en el formato
+   difícil, donde las tres variantes dan 73,2% exacto. El trabajo que movió la
+   aguja fue medir el techo, no escribir el prompt.
+2. **La alucinación se parte igual que la precisión:** 0,0% en COMPR.AR y 5,9%
+   en formato libre. El modelo inventa justo donde el documento no tiene el dato,
+   que es el error más caro en producción.
+3. **El parser sin IA alucina nueve veces menos** (0,4% contra 2,9%) y en
+   COMPR.AR está a 4 puntos del modelo, gratis.
+
+### La confianza que el modelo se autoasigna no sirve para rutear
+
+| Umbral | Auto-procesado | A revisión | Precisión sobre lo auto |
+|---:|---:|---:|---:|
+| 0,00 – 0,80 | 100% | 0% | 83,5% |
+| 0,85 | 97% | 3% | 83,9% |
+| 0,95 | 90% | 10% | 85,1% |
+| **1,00** | **56%** | **44%** | **91,0%** |
+
+El modelo se declara con confianza ≥ 0,85 en el 97% de los documentos: la escala
+está colapsada y lo único que informa es el corte entre `1,00` y el resto.
+
+**Rutear por formato es mejor y es gratis.** El formato se conoce antes de llamar
+al modelo: auto-procesar COMPR.AR da el 50% del corpus al 93,5%, contra el 56% al
+91,0% que da el umbral de confianza. Más precisión, sin pagar la llamada para
+enterarse. **Esa es la conclusión operativa del proyecto, y contradice lo que yo
+esperaba encontrar cuando escribí la curva.**
 
 ## Arquitectura
 
@@ -144,14 +203,14 @@ y por formato:
   directamente ausentes.
 
 Esa distinción importa: reportar el resultado por segmento dice mucho más que un
-promedio único. `COMPLETAR`% en formato COMPR.AR contra `COMPLETAR`% en formato
-libre es un hallazgo; el promedio de los dos esconde justamente dónde falla.
+promedio único. **93,5% en formato COMPR.AR contra 73,2% en formato libre** es un
+hallazgo; el 83,5% promedio de los dos esconde justamente dónde falla.
+
+Y la distinción no es sólo del modelo: el techo humano también se parte, 98,7%
+contra 72,7%. **Los dos lados de la grieta aparecen en las dos mediciones
+independientes**, lo que dice que la variable es el documento y no el extractor.
 
 ## Lo que no resuelve
-
-*(Completá esta sección cuando termines. Es la más importante del README y la que
-casi nadie escribe. Un proyecto que documenta sus propios límites se lee como
-trabajo profesional; uno que sólo muestra el número bueno se lee como demo.)*
 
 - **Adjudicaciones y preadjudicaciones** (29 de los 296 avisos del corpus) quedan
   fuera. Son avisos de *resultado*, no de convocatoria: no tienen fecha de
@@ -165,18 +224,61 @@ trabajo profesional; uno que sólo muestra el número bueno se lee como demo.)*
 - **Avisos de más de 60.000 caracteres.** `src/extraer.py` los corta. Ninguno del
   corpus actual se acerca (el más largo tiene 4.220), pero el límite existe y hay
   que declararlo.
-- `COMPLETAR`
+- **El techo lo midió la misma persona dos veces.** Es consistencia propia, no
+  acuerdo entre anotadores: está sesgado hacia arriba, porque una persona repite
+  sus propios criterios —y sus propios malentendidos— mejor de lo que dos
+  personas coinciden. Un segundo anotador bajaría el techo, y con eso cambiaría
+  la lectura de "el modelo está en el techo" a "el modelo está por encima de lo
+  que una persona sola logra reproducir". **No está medido y no se afirma.**
+- **El efecto del modelo está medido a medias.** `v4-modelo-caro` tiene 53 de 115
+  documentos, así que la pregunta "¿un modelo más caro mejora?" todavía no tiene
+  respuesta válida. La tabla lo marca y el reporte se niega a coronarlo. Faltan
+  62 llamadas.
+- **Una etiqueta del set de oro estaba mal y la encontró un modelo**, no yo: el
+  aviso `44538-26` decía apertura el 13/07 y yo había tipeado 3/07. Apareció
+  desde el [proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)
+  al cruzar contra el registro oficial. Corregida y registrada en
+  [`docs/CORRECCIONES.md`](docs/CORRECCIONES.md). **Auditados los avisos con
+  bloque legible: 1 etiqueta mal, 0 extracciones del modelo mal sobre 29.** Si
+  hay un error en 29 campos auditables, es razonable suponer que hay otros en los
+  que no se pudieron auditar.
+- **La confianza del modelo no se puede usar para rutear**, como muestra la curva
+  de umbral. El proyecto se planteaba encontrar el umbral óptimo y lo que
+  encontró es que esa palanca casi no existe en este modelo. Es un resultado
+  negativo y se informa igual.
 
 ## Consistencia del propio set de referencia
 
-Doble etiquetado ciego de 20 documentos: `COMPLETAR`% de coincidencia conmigo
-mismo. Ese es el techo de este experimento — ningún modelo puede superar la
-consistencia de la verdad de referencia contra la que se lo mide.
+Doble etiquetado ciego de 20 documentos, estratificado por formato, sin ver las
+respuestas anteriores y cronometrado: **85,7% de coincidencia conmigo mismo.**
+Ese es el techo de este experimento — ningún modelo puede superar la consistencia
+de la verdad de referencia contra la que se lo mide.
+
+**Y el techo se parte igual que todo lo demás:**
+
+| | Techo humano |
+|---|---:|
+| Formato COMPR.AR | **98,7%** |
+| Formato libre | **72,7%** |
+
+Ese desglose es el hallazgo más importante del proyecto. Un modelo al 73% en
+formato libre no está fallando: está en el límite de lo que el documento permite
+decidir sin información que no está escrita. Reportar "73%" sin el techo al lado
+invita a la conclusión equivocada, que es gastar en un modelo mejor.
+
+**Lo que el control ciego detectó además del número:**
+
+1. **El sesgo de anclaje, medido y no supuesto.** La pasada asistida aceptaba la
+   sobre-captura del parser en `organismo` donde la pasada ciega acertaba. El
+   control encontró un error sistemático de la propia metodología.
+2. **Dos reglas faltantes del protocolo.** Al escribirlas y aplicarlas, el techo
+   subió de 79,7% a 85,7% y los documentos idénticos entre pasadas de 10% a 35%.
+   Buena parte de lo que parecía inconsistencia humana era protocolo incompleto.
+3. **El tiempo humano real:** 113 segundos por documento (mediana). El promedio
+   de 222 s se descarta: un documento se llevó 1.080 s y arrastra el promedio.
+   Reportar la media habría inflado el ahorro del modelo al doble.
 
 ## Decisiones que tomé y por qué
-
-*(Completá con las tuyas a medida que aparezcan. Esta sección es la que se
-convierte en tus respuestas de entrevista.)*
 
 - **La hora cuenta en `fecha_apertura`.** En una apertura de ofertas, equivocarse
   de hora es equivocarse. Si el caso de uso no la necesitara, cambiaría el
@@ -201,4 +303,19 @@ convierte en tus respuestas de entrevista.)*
   costo contra esa vara, y sólo en el segmento donde la diferencia existe. La
   pregunta del proyecto deja de ser "qué modelo anda mejor" y pasa a ser **dónde
   se justifica pagar por un modelo**.
-- `COMPLETAR`
+- **Nunca un promedio único.** Cada número va con su `n` y partido por formato,
+  al lado de su propio techo. El 83,5% global es cierto y no sirve para decidir
+  nada.
+- **La variante ganadora se elige sólo entre las que tienen cobertura completa.**
+  La tabla llegó a coronar a `v4-modelo-caro` con 83,9% sobre 53 documentos
+  contra `v3-ejemplos` con 83,5% sobre 115. No es la misma prueba, así que esos
+  0,4 puntos no significaban nada. El dato estaba en `metricas.json`
+  (`n_documentos: 53`, `errores_llamada: 62`) y el reporte no lo mostraba, **que
+  es peor que no tenerlo**. Ahora la columna `n` está en la tabla, las variantes
+  incompletas quedan marcadas, y si ninguna tiene cobertura completa el reporte
+  se niega a generarse.
+- **Rutear por formato, no por la confianza del modelo.** Es más preciso, se sabe
+  antes de llamar al modelo y sale gratis. Lo encontré buscando lo contrario.
+- **Un número demasiado limpio se investiga antes de publicarlo.** Esta regla
+  salió del proyecto 02, donde un "cero discrepancias" resultó ser seis bugs
+  propios, y se aplica para atrás: por eso `v4` se marca en vez de celebrarse.
