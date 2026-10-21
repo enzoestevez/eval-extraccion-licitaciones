@@ -23,6 +23,10 @@
 > COMPR.AR a costo cero. El modelo sólo le gana por 4 puntos ahí, y por 21 en
 > formato libre. **Ahí está la respuesta a dónde se justifica pagar por un
 > modelo**, que es la pregunta que el proyecto se hizo.
+>
+> **Y el modelo caro:** +2,5 puntos de precisión, +8,2 de documentos perfectos,
+> 3,9× el costo — medido sobre los mismos 61 documentos, porque la capa gratuita
+> permite 20 pedidos por día y comparar 61 contra 115 no es comparar.
 
 ---
 
@@ -76,12 +80,55 @@ sola con `src/reporte.py`, desde `reports/metricas.json`.
 | `v1-minimo` | 115 | 83,2% | 93,0% | 73,2% | 30,4% | 3,7% | 0,000622 |
 | `v2-reglas` | 115 | 83,1% | 92,7% | 73,2% | 27,8% | 2,6% | 0,000681 |
 | `v0-reglas` *(sin IA)* | 115 | 71,0% | 89,5% | 52,1% | 27,0% | **0,4%** | **0** |
-| `v4-modelo-caro` | **53** ⚠ | 83,9% | 97,1% | 73,7% | 32,1% | 2,8% | 0,002858 |
+| `v4-modelo-caro` | **61** ⚠ | 84,4% | 97,0% | 73,9% | 36,1% | 2,7% | 0,002844 |
 
-`v4-modelo-caro` está marcada porque tiene 53 de 115 documentos: su precisión
-está calculada sobre otro subconjunto y **no entra en ninguna conclusión**. El
-reporte la marca solo y elige la variante ganadora únicamente entre las que
-tienen cobertura completa.
+`v4-modelo-caro` está marcada porque tiene 61 de 115 documentos: su precisión
+está calculada sobre otro subconjunto y **no entra en esta tabla como
+conclusión**. El reporte la marca solo y elige la variante ganadora únicamente
+entre las que tienen cobertura completa.
+
+**Por qué le faltan 54 documentos, y por qué no se completó.** La capa gratuita
+permite **20 pedidos por día** a ese modelo:
+
+```
+Quota exceeded for metric: generate_content_free_tier_requests,
+limit: 20, model: gemini-3.6-flash
+Please retry in 9h21m26.597663521s
+```
+
+Completarla serían tres días de cupo. **Pero la pregunta se contesta sin gastar
+nada** — ver la sección siguiente.
+
+### Comparación emparejada: el efecto del modelo, sobre la misma prueba
+
+La comparación válida nunca fue 61 contra 115. Es medir **todas** las variantes
+sobre los **mismos 61 documentos**: la intersección donde todas tienen extracción
+válida. Las predicciones ya estaban guardadas, así que **la comparación salió a
+costo cero.**
+
+| Variante | Precisión | Docs perfectos | Alucinación | USD/doc |
+|---|---:|---:|---:|---:|
+| `v4-modelo-caro` | **84,4%** | **36,1%** | 2,7% | 0,002844 |
+| `v3-ejemplos` | 81,9% | 27,9% | 3,3% | 0,000738 |
+| `v2-reglas` | 81,2% | 24,6% | 2,9% | 0,000670 |
+| `v1-minimo` | 80,8% | 24,6% | 4,1% | 0,000611 |
+| `v0-reglas` *(sin IA)* | 72,5% | **31,1%** | **0,2%** | **0** |
+
+**El modelo caro gana +2,5 puntos de precisión y +8,2 de documentos perfectos, a
+3,9× el costo.**
+
+Y la métrica que decide **no es la precisión: son los documentos perfectos.** El
+sistema que consume esta extracción
+([proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)) arma
+una llave con varios campos — un error en `numero_procedimiento` no degrada el
+caso, lo **mata**. Con ese criterio la diferencia no es de 2,5 puntos sino de
+8,2, y ahí la discusión del costo cambia de signo.
+
+**Y un detalle que el promedio global escondía:** `v0-reglas`, sin IA y gratis,
+tiene **más documentos perfectos que `v3-ejemplos`** (31,1% contra 27,9%) con 9,5
+puntos menos de precisión. El parser determinista acierta el documento entero más
+seguido, pero cuando falla, falla en más campos a la vez. **Son dos perfiles de
+error distintos que un promedio junta en un solo número.**
 
 **Tres cosas que este cuadro dice y un promedio no diría:**
 
@@ -230,10 +277,20 @@ independientes**, lo que dice que la variable es el documento y no el extractor.
   personas coinciden. Un segundo anotador bajaría el techo, y con eso cambiaría
   la lectura de "el modelo está en el techo" a "el modelo está por encima de lo
   que una persona sola logra reproducir". **No está medido y no se afirma.**
-- **El efecto del modelo está medido a medias.** `v4-modelo-caro` tiene 53 de 115
-  documentos, así que la pregunta "¿un modelo más caro mejora?" todavía no tiene
-  respuesta válida. La tabla lo marca y el reporte se niega a coronarlo. Faltan
-  62 llamadas.
+- **El efecto del modelo está medido sobre 61 documentos, no sobre 115.** La capa
+  gratuita permite 20 pedidos por día a ese modelo, así que la comparación se
+  hizo sobre la intersección donde todas las variantes tienen extracción válida.
+  Es una comparación **válida** —misma prueba para todas— pero con la mitad de la
+  muestra: el intervalo es más ancho de lo que sugiere un número con un decimal,
+  y la cobertura completa queda sin medir.
+- **El 429 llegó atribuido a `gemini-3.6-flash` y `variantes.py` pide
+  `gemini-3.5-flash`.** El proveedor enruta a otro modelo y las predicciones
+  guardan el modelo que se **pidió**, no el que **contestó**. Es el capítulo
+  siguiente de la lección que ya está más arriba: no sólo caducan los
+  identificadores — el proveedor puede contestar con otro modelo, y si no se
+  registra cuál, no se puede saber. **Eso vuelve provisorio el "efecto del
+  modelo":** si las dos variantes corrieron en el mismo modelo, lo medido no es
+  el efecto del modelo. Anotado en `docs/PENDIENTES.md`.
 - **Una etiqueta del set de oro estaba mal y la encontró un modelo**, no yo: el
   aviso `44538-26` decía apertura el 13/07 y yo había tipeado 3/07. Apareció
   desde el [proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)
