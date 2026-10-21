@@ -1,0 +1,2273 @@
+{
+  "n_etiquetados": 115,
+  "variantes": [
+    {
+      "variante": "v0-base",
+      "n_documentos": 115,
+      "errores_llamada": 0,
+      "precision_ponderada": 0.1643,
+      "docs_perfectos": 0.0,
+      "tasa_alucinacion": 0.0,
+      "latencia_p50_ms": 10,
+      "latencia_p95_ms": 10,
+      "tokens_in": 32471,
+      "tokens_out": 13800,
+      "costo_total_usd": null,
+      "costo_por_doc_usd": null,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.0,
+          "peso": 1.5,
+          "acierto": 0,
+          "acierto_null": 0,
+          "error": 115,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.2174,
+          "peso": 2.0,
+          "acierto": 0,
+          "acierto_null": 25,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 90
+        },
+        "tipo_procedimiento": {
+          "precision": 0.0,
+          "peso": 1.0,
+          "acierto": 0,
+          "acierto_null": 0,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 115
+        },
+        "numero_procedimiento": {
+          "precision": 0.0783,
+          "peso": 1.5,
+          "acierto": 0,
+          "acierto_null": 9,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 106
+        },
+        "objeto": {
+          "precision": 0.0957,
+          "peso": 1.0,
+          "acierto": 0,
+          "acierto_null": 11,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 104
+        },
+        "monto_estimado": {
+          "precision": 0.7826,
+          "peso": 0.5,
+          "acierto": 0,
+          "acierto_null": 90,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 25
+        },
+        "fecha_apertura": {
+          "precision": 0.1043,
+          "peso": 2.0,
+          "acierto": 0,
+          "acierto_null": 12,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 103
+        },
+        "valor_pliego": {
+          "precision": 0.7913,
+          "peso": 0.5,
+          "acierto": 0,
+          "acierto_null": 91,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 24
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.1643
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.0,
+          "tasa_revision": 1.0,
+          "precision_auto": null
+        }
+      ],
+      "peores": [
+        {
+          "id": "38457-26",
+          "puntaje": 0.0,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "40608-26",
+          "puntaje": 0.0,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "32082-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "33031-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35143-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35467-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35468-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36041-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "36042-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "36227-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        }
+      ]
+    },
+    {
+      "variante": "v0-reglas",
+      "n_documentos": 115,
+      "errores_llamada": 0,
+      "precision_ponderada": 0.7097,
+      "docs_perfectos": 0.2696,
+      "tasa_alucinacion": 0.0043,
+      "latencia_p50_ms": 0,
+      "latencia_p95_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "costo_total_usd": 0.0,
+      "costo_por_doc_usd": 0.0,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.6609,
+          "peso": 1.5,
+          "acierto": 76,
+          "acierto_null": 0,
+          "error": 39,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.7217,
+          "peso": 2.0,
+          "acierto": 58,
+          "acierto_null": 25,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 32
+        },
+        "tipo_procedimiento": {
+          "precision": 0.8435,
+          "peso": 1.0,
+          "acierto": 97,
+          "acierto_null": 0,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 18
+        },
+        "numero_procedimiento": {
+          "precision": 0.8522,
+          "peso": 1.5,
+          "acierto": 93,
+          "acierto_null": 5,
+          "error": 0,
+          "alucinacion": 4,
+          "omision": 13
+        },
+        "objeto": {
+          "precision": 0.8146,
+          "peso": 1.0,
+          "acierto": 78,
+          "acierto_null": 11,
+          "error": 8,
+          "alucinacion": 0,
+          "omision": 18
+        },
+        "monto_estimado": {
+          "precision": 0.8174,
+          "peso": 0.5,
+          "acierto": 4,
+          "acierto_null": 90,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 21
+        },
+        "fecha_apertura": {
+          "precision": 0.4522,
+          "peso": 2.0,
+          "acierto": 40,
+          "acierto_null": 12,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 63
+        },
+        "valor_pliego": {
+          "precision": 0.8261,
+          "peso": 0.5,
+          "acierto": 4,
+          "acierto_null": 91,
+          "error": 0,
+          "alucinacion": 0,
+          "omision": 20
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.7097
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.7097
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.7097
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.7097
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 0.9391,
+          "tasa_revision": 0.0609,
+          "precision_auto": 0.7363
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 0.9391,
+          "tasa_revision": 0.0609,
+          "precision_auto": 0.7363
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 0.9391,
+          "tasa_revision": 0.0609,
+          "precision_auto": 0.7363
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 0.8435,
+          "tasa_revision": 0.1565,
+          "precision_auto": 0.7571
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 0.8435,
+          "tasa_revision": 0.1565,
+          "precision_auto": 0.7571
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 0.8435,
+          "tasa_revision": 0.1565,
+          "precision_auto": 0.7571
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 0.8435,
+          "tasa_revision": 0.1565,
+          "precision_auto": 0.7571
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 0.687,
+          "tasa_revision": 0.313,
+          "precision_auto": 0.8106
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 0.687,
+          "tasa_revision": 0.313,
+          "precision_auto": 0.8106
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 0.687,
+          "tasa_revision": 0.313,
+          "precision_auto": 0.8106
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 0.4696,
+          "tasa_revision": 0.5304,
+          "precision_auto": 0.9223
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 0.4696,
+          "tasa_revision": 0.5304,
+          "precision_auto": 0.9223
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 0.4696,
+          "tasa_revision": 0.5304,
+          "precision_auto": 0.9223
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 0.3478,
+          "tasa_revision": 0.6522,
+          "precision_auto": 0.9388
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 0.3478,
+          "tasa_revision": 0.6522,
+          "precision_auto": 0.9388
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.3478,
+          "tasa_revision": 0.6522,
+          "precision_auto": 0.9388
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.3478,
+          "tasa_revision": 0.6522,
+          "precision_auto": 0.9388
+        }
+      ],
+      "peores": [
+        {
+          "id": "35143-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.17,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36899-26",
+          "puntaje": 0.05,
+          "exacto": false,
+          "confianza": 0.17,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "36725-26",
+          "puntaje": 0.15,
+          "exacto": false,
+          "confianza": 0.5,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "40608-26",
+          "puntaje": 0.25,
+          "exacto": false,
+          "confianza": 0.5,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "omision",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "42071-26",
+          "puntaje": 0.25,
+          "exacto": false,
+          "confianza": 0.17,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "omision",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42562-26",
+          "puntaje": 0.25,
+          "exacto": false,
+          "confianza": 0.17,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "omision",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "36751-26",
+          "puntaje": 0.2517,
+          "exacto": false,
+          "confianza": 0.67,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "37721-26",
+          "puntaje": 0.3643,
+          "exacto": false,
+          "confianza": 0.67,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "omision",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36006-26",
+          "puntaje": 0.3685,
+          "exacto": false,
+          "confianza": 0.67,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "omision",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "39989-26",
+          "puntaje": 0.383,
+          "exacto": false,
+          "confianza": 0.33,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "omision",
+            "objeto": "error",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        }
+      ]
+    },
+    {
+      "variante": "v1-minimo",
+      "n_documentos": 115,
+      "errores_llamada": 0,
+      "precision_ponderada": 0.8316,
+      "docs_perfectos": 0.3043,
+      "tasa_alucinacion": 0.037,
+      "latencia_p50_ms": 4282,
+      "latencia_p95_ms": 20032,
+      "tokens_in": 52403,
+      "tokens_out": 22311,
+      "costo_total_usd": 0.0715,
+      "costo_por_doc_usd": 0.000622,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.6261,
+          "peso": 1.5,
+          "acierto": 72,
+          "acierto_null": 0,
+          "error": 43,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.9043,
+          "peso": 2.0,
+          "acierto": 83,
+          "acierto_null": 21,
+          "error": 7,
+          "alucinacion": 4,
+          "omision": 0
+        },
+        "tipo_procedimiento": {
+          "precision": 0.8696,
+          "peso": 1.0,
+          "acierto": 100,
+          "acierto_null": 0,
+          "error": 15,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "numero_procedimiento": {
+          "precision": 0.8696,
+          "peso": 1.5,
+          "acierto": 100,
+          "acierto_null": 0,
+          "error": 6,
+          "alucinacion": 9,
+          "omision": 0
+        },
+        "objeto": {
+          "precision": 0.7336,
+          "peso": 1.0,
+          "acierto": 70,
+          "acierto_null": 0,
+          "error": 34,
+          "alucinacion": 11,
+          "omision": 0
+        },
+        "monto_estimado": {
+          "precision": 0.8957,
+          "peso": 0.5,
+          "acierto": 13,
+          "acierto_null": 90,
+          "error": 1,
+          "alucinacion": 0,
+          "omision": 11
+        },
+        "fecha_apertura": {
+          "precision": 0.887,
+          "peso": 2.0,
+          "acierto": 90,
+          "acierto_null": 12,
+          "error": 12,
+          "alucinacion": 0,
+          "omision": 1
+        },
+        "valor_pliego": {
+          "precision": 0.8783,
+          "peso": 0.5,
+          "acierto": 20,
+          "acierto_null": 81,
+          "error": 0,
+          "alucinacion": 10,
+          "omision": 4
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8316
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.9826,
+          "tasa_revision": 0.0174,
+          "precision_auto": 0.8333
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.6696,
+          "tasa_revision": 0.3304,
+          "precision_auto": 0.8917
+        }
+      ],
+      "peores": [
+        {
+          "id": "36732-26",
+          "puntaje": 0.2674,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36478-26",
+          "puntaje": 0.325,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35800-26",
+          "puntaje": 0.3423,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "36007-26",
+          "puntaje": 0.4715,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "41938-26",
+          "puntaje": 0.473,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42394-26",
+          "puntaje": 0.477,
+          "exacto": false,
+          "confianza": 0.9,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto_null",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36043-26",
+          "puntaje": 0.4795,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "32410-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35547-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 1.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "error",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto"
+          }
+        },
+        {
+          "id": "41469-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 1.0,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "error",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        }
+      ]
+    },
+    {
+      "variante": "v2-reglas",
+      "n_documentos": 115,
+      "errores_llamada": 0,
+      "precision_ponderada": 0.8306,
+      "docs_perfectos": 0.2783,
+      "tasa_alucinacion": 0.0261,
+      "latencia_p50_ms": 4142,
+      "latencia_p95_ms": 4966,
+      "tokens_in": 75633,
+      "tokens_out": 22240,
+      "costo_total_usd": 0.0783,
+      "costo_por_doc_usd": 0.000681,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.6261,
+          "peso": 1.5,
+          "acierto": 72,
+          "acierto_null": 0,
+          "error": 43,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.913,
+          "peso": 2.0,
+          "acierto": 82,
+          "acierto_null": 23,
+          "error": 7,
+          "alucinacion": 2,
+          "omision": 1
+        },
+        "tipo_procedimiento": {
+          "precision": 0.8783,
+          "peso": 1.0,
+          "acierto": 101,
+          "acierto_null": 0,
+          "error": 14,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "numero_procedimiento": {
+          "precision": 0.8435,
+          "peso": 1.5,
+          "acierto": 97,
+          "acierto_null": 0,
+          "error": 9,
+          "alucinacion": 9,
+          "omision": 0
+        },
+        "objeto": {
+          "precision": 0.741,
+          "peso": 1.0,
+          "acierto": 71,
+          "acierto_null": 0,
+          "error": 33,
+          "alucinacion": 11,
+          "omision": 0
+        },
+        "monto_estimado": {
+          "precision": 0.8957,
+          "peso": 0.5,
+          "acierto": 13,
+          "acierto_null": 90,
+          "error": 1,
+          "alucinacion": 0,
+          "omision": 11
+        },
+        "fecha_apertura": {
+          "precision": 0.8957,
+          "peso": 2.0,
+          "acierto": 91,
+          "acierto_null": 12,
+          "error": 11,
+          "alucinacion": 0,
+          "omision": 1
+        },
+        "valor_pliego": {
+          "precision": 0.8348,
+          "peso": 0.5,
+          "acierto": 7,
+          "acierto_null": 89,
+          "error": 0,
+          "alucinacion": 2,
+          "omision": 17
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8306
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 0.9913,
+          "tasa_revision": 0.0087,
+          "precision_auto": 0.83
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 0.9826,
+          "tasa_revision": 0.0174,
+          "precision_auto": 0.8343
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.9391,
+          "tasa_revision": 0.0609,
+          "precision_auto": 0.8373
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.6348,
+          "tasa_revision": 0.3652,
+          "precision_auto": 0.896
+        }
+      ],
+      "peores": [
+        {
+          "id": "36732-26",
+          "puntaje": 0.2674,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36007-26",
+          "puntaje": 0.3215,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36478-26",
+          "puntaje": 0.325,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35800-26",
+          "puntaje": 0.3431,
+          "exacto": false,
+          "confianza": 0.85,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "41938-26",
+          "puntaje": 0.473,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42394-26",
+          "puntaje": 0.477,
+          "exacto": false,
+          "confianza": 0.9,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto_null",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "32410-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35547-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 1.0,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "error",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto"
+          }
+        },
+        {
+          "id": "36899-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "omision",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "41469-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 1.0,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "error",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        }
+      ]
+    },
+    {
+      "variante": "v3-ejemplos",
+      "n_documentos": 115,
+      "errores_llamada": 0,
+      "precision_ponderada": 0.8345,
+      "docs_perfectos": 0.313,
+      "tasa_alucinacion": 0.0293,
+      "latencia_p50_ms": 3870,
+      "latencia_p95_ms": 37442,
+      "tokens_in": 104268,
+      "tokens_out": 22028,
+      "costo_total_usd": 0.0864,
+      "costo_por_doc_usd": 0.000751,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.6435,
+          "peso": 1.5,
+          "acierto": 74,
+          "acierto_null": 0,
+          "error": 41,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.913,
+          "peso": 2.0,
+          "acierto": 82,
+          "acierto_null": 23,
+          "error": 7,
+          "alucinacion": 2,
+          "omision": 1
+        },
+        "tipo_procedimiento": {
+          "precision": 0.8783,
+          "peso": 1.0,
+          "acierto": 101,
+          "acierto_null": 0,
+          "error": 14,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "numero_procedimiento": {
+          "precision": 0.8783,
+          "peso": 1.5,
+          "acierto": 101,
+          "acierto_null": 0,
+          "error": 5,
+          "alucinacion": 9,
+          "omision": 0
+        },
+        "objeto": {
+          "precision": 0.7448,
+          "peso": 1.0,
+          "acierto": 71,
+          "acierto_null": 0,
+          "error": 33,
+          "alucinacion": 11,
+          "omision": 0
+        },
+        "monto_estimado": {
+          "precision": 0.8957,
+          "peso": 0.5,
+          "acierto": 13,
+          "acierto_null": 90,
+          "error": 1,
+          "alucinacion": 0,
+          "omision": 11
+        },
+        "fecha_apertura": {
+          "precision": 0.8783,
+          "peso": 2.0,
+          "acierto": 89,
+          "acierto_null": 12,
+          "error": 11,
+          "alucinacion": 0,
+          "omision": 3
+        },
+        "valor_pliego": {
+          "precision": 0.8174,
+          "peso": 0.5,
+          "acierto": 8,
+          "acierto_null": 86,
+          "error": 0,
+          "alucinacion": 5,
+          "omision": 16
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8345
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 0.9652,
+          "tasa_revision": 0.0348,
+          "precision_auto": 0.8391
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 0.9304,
+          "tasa_revision": 0.0696,
+          "precision_auto": 0.8461
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.8957,
+          "tasa_revision": 0.1043,
+          "precision_auto": 0.8513
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.5565,
+          "tasa_revision": 0.4435,
+          "precision_auto": 0.9096
+        }
+      ],
+      "peores": [
+        {
+          "id": "36732-26",
+          "puntaje": 0.2674,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "41938-26",
+          "puntaje": 0.3121,
+          "exacto": false,
+          "confianza": 0.85,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36478-26",
+          "puntaje": 0.3258,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35800-26",
+          "puntaje": 0.3423,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "omision"
+          }
+        },
+        {
+          "id": "42434-26",
+          "puntaje": 0.4,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42394-26",
+          "puntaje": 0.477,
+          "exacto": false,
+          "confianza": 0.8,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto_null",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "32410-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.9,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35547-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "error",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto"
+          }
+        },
+        {
+          "id": "41469-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "acierto",
+            "expediente": "error",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42843-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "acierto",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "error",
+            "valor_pliego": "alucinacion"
+          }
+        }
+      ]
+    },
+    {
+      "variante": "v4-modelo-caro",
+      "n_documentos": 53,
+      "errores_llamada": 62,
+      "precision_ponderada": 0.8385,
+      "docs_perfectos": 0.3208,
+      "tasa_alucinacion": 0.0283,
+      "latencia_p50_ms": 12153,
+      "latencia_p95_ms": 46294,
+      "tokens_in": 47042,
+      "tokens_out": 8993,
+      "costo_total_usd": 0.1515,
+      "costo_por_doc_usd": 0.002858,
+      "por_campo": {
+        "organismo": {
+          "precision": 0.7358,
+          "peso": 1.5,
+          "acierto": 39,
+          "acierto_null": 0,
+          "error": 14,
+          "alucinacion": 0,
+          "omision": 0
+        },
+        "expediente": {
+          "precision": 0.9434,
+          "peso": 2.0,
+          "acierto": 35,
+          "acierto_null": 15,
+          "error": 2,
+          "alucinacion": 1,
+          "omision": 0
+        },
+        "tipo_procedimiento": {
+          "precision": 0.8113,
+          "peso": 1.0,
+          "acierto": 43,
+          "acierto_null": 0,
+          "error": 9,
+          "alucinacion": 0,
+          "omision": 1
+        },
+        "numero_procedimiento": {
+          "precision": 0.8491,
+          "peso": 1.5,
+          "acierto": 45,
+          "acierto_null": 0,
+          "error": 4,
+          "alucinacion": 4,
+          "omision": 0
+        },
+        "objeto": {
+          "precision": 0.7438,
+          "peso": 1.0,
+          "acierto": 30,
+          "acierto_null": 0,
+          "error": 17,
+          "alucinacion": 6,
+          "omision": 0
+        },
+        "monto_estimado": {
+          "precision": 0.9245,
+          "peso": 0.5,
+          "acierto": 9,
+          "acierto_null": 40,
+          "error": 1,
+          "alucinacion": 0,
+          "omision": 3
+        },
+        "fecha_apertura": {
+          "precision": 0.8491,
+          "peso": 2.0,
+          "acierto": 38,
+          "acierto_null": 7,
+          "error": 6,
+          "alucinacion": 0,
+          "omision": 2
+        },
+        "valor_pliego": {
+          "precision": 0.8113,
+          "peso": 0.5,
+          "acierto": 4,
+          "acierto_null": 39,
+          "error": 1,
+          "alucinacion": 1,
+          "omision": 8
+        }
+      },
+      "curva_umbral": [
+        {
+          "umbral": 0.0,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.05,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.1,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.15,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.2,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.25,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.3,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.35,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.4,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.45,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.5,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.55,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.6,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.65,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.7,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.75,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.8,
+          "tasa_auto": 1.0,
+          "tasa_revision": 0.0,
+          "precision_auto": 0.8385
+        },
+        {
+          "umbral": 0.85,
+          "tasa_auto": 0.9623,
+          "tasa_revision": 0.0377,
+          "precision_auto": 0.8515
+        },
+        {
+          "umbral": 0.9,
+          "tasa_auto": 0.9623,
+          "tasa_revision": 0.0377,
+          "precision_auto": 0.8515
+        },
+        {
+          "umbral": 0.95,
+          "tasa_auto": 0.9057,
+          "tasa_revision": 0.0943,
+          "precision_auto": 0.8677
+        },
+        {
+          "umbral": 1.0,
+          "tasa_auto": 0.0189,
+          "tasa_revision": 0.9811,
+          "precision_auto": 1.0
+        }
+      ],
+      "peores": [
+        {
+          "id": "35800-26",
+          "puntaje": 0.3424,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "error"
+          }
+        },
+        {
+          "id": "36007-26",
+          "puntaje": 0.3594,
+          "exacto": false,
+          "confianza": 0.9,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42434-26",
+          "puntaje": 0.4,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "alucinacion",
+            "objeto": "acierto",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "36478-26",
+          "puntaje": 0.475,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "error",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "omision",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "33235-26",
+          "puntaje": 0.4769,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "32410-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.8,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "omision",
+            "numero_procedimiento": "error",
+            "objeto": "alucinacion",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "35547-26",
+          "puntaje": 0.5,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto",
+            "tipo_procedimiento": "acierto",
+            "numero_procedimiento": "acierto",
+            "objeto": "alucinacion",
+            "monto_estimado": "error",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto"
+          }
+        },
+        {
+          "id": "36043-26",
+          "puntaje": 0.5145,
+          "exacto": false,
+          "confianza": 0.8,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "error",
+            "objeto": "error",
+            "monto_estimado": "omision",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42843-26",
+          "puntaje": 0.55,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "acierto",
+            "monto_estimado": "acierto",
+            "fecha_apertura": "error",
+            "valor_pliego": "acierto_null"
+          }
+        },
+        {
+          "id": "42508-26",
+          "puntaje": 0.6689,
+          "exacto": false,
+          "confianza": 0.95,
+          "detalle": {
+            "organismo": "error",
+            "expediente": "acierto_null",
+            "tipo_procedimiento": "error",
+            "numero_procedimiento": "acierto",
+            "objeto": "error",
+            "monto_estimado": "acierto_null",
+            "fecha_apertura": "acierto",
+            "valor_pliego": "acierto_null"
+          }
+        }
+      ]
+    }
+  ]
+}

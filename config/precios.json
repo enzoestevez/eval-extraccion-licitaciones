@@ -1,10 +1,33 @@
 {
-  "_nota": "Precios en USD por millon de tokens. Completalos vos desde la pagina de precios de cada proveedor y anota la fecha de consulta en el README. No hay valores por defecto a proposito: un precio inventado en tu reporte es peor que no tener el numero.",
-  "_consultado_el": "COMPLETAR (AAAA-MM-DD)",
-
-  "v1-minimo": { "usd_por_millon_in": null, "usd_por_millon_out": null },
-  "v2-reglas": { "usd_por_millon_in": null, "usd_por_millon_out": null },
-  "v3-ejemplos": { "usd_por_millon_in": null, "usd_por_millon_out": null },
-  "v4-modelo-caro": { "usd_por_millon_in": null, "usd_por_millon_out": null },
-  "v5-otro-proveedor": { "usd_por_millon_in": null, "usd_por_millon_out": null }
+  "_nota": "Precios en USD por millon de tokens. VERIFICALOS en la pagina oficial y actualiza la fecha: cambian, y los modelos se deprecan. Si cambias un modelo en variantes.py, cambia el precio aca. Fuente: ai.google.dev/gemini-api/docs/pricing",
+  "_consultado_el": "2026-09-02",
+  "v0-reglas": {
+    "usd_por_millon_in": 0.0,
+    "usd_por_millon_out": 0.0
+  },
+  "v1-minimo": {
+    "usd_por_millon_in": 0.3,
+    "usd_por_millon_out": 2.5,
+    "_modelo": "gemini-3.5-flash-lite"
+  },
+  "v2-reglas": {
+    "usd_por_millon_in": 0.3,
+    "usd_por_millon_out": 2.5,
+    "_modelo": "gemini-3.5-flash-lite"
+  },
+  "v3-ejemplos": {
+    "usd_por_millon_in": 0.3,
+    "usd_por_millon_out": 2.5,
+    "_modelo": "gemini-3.5-flash-lite"
+  },
+  "v4-modelo-caro": {
+    "usd_por_millon_in": 1.5,
+    "usd_por_millon_out": 9.0,
+    "_modelo": "gemini-3.5-flash"
+  },
+  "v5-otro-proveedor": {
+    "usd_por_millon_in": 1.0,
+    "usd_por_millon_out": 5.0,
+    "_modelo": "claude-haiku-4-5"
+  }
 }

@@ -31,6 +31,14 @@ umbral de confianza conviene dejar de revisarlo a mano?**
   ([`docs/protocolo-etiquetado.md`](docs/protocolo-etiquetado.md)). Sin IA en el
   etiquetado: si la verdad la genera un modelo, no se mide precisión, se mide el
   acuerdo entre dos modelos.
+- **Etiquetado asistido por reglas, con muestra ciega de control.** Para no
+  tipear ocho campos por aviso, un parser determinista (`src/reglas.py`, sin IA)
+  precarga los valores y yo acepto o corrijo. Eso introduce **sesgo de anclaje**:
+  un valor sugerido se acepta con menos escrutinio que uno escrito de cero. Por
+  eso el **15% de los avisos se etiqueta sin ninguna sugerencia**, elegido de
+  forma determinista por su id, y cada campo guarda si fue aceptado, corregido o
+  escrito a mano. Comparar el desempeño del parser en los avisos asistidos contra
+  los ciegos mide el sesgo en puntos, en vez de dejarlo como una sospecha.
 - **Comparación normalizada**, no por igualdad de strings. `"$ 1.250.000,50"` y
   `1250000.5` son el mismo monto. Comparar crudo mide el parser, no el modelo.
 - **Precisión ponderada por campo.** Errar el expediente no cuesta lo mismo que
@@ -186,4 +194,11 @@ convierte en tus respuestas de entrevista.)*
   en el encabezado de `src/esquema.py` con el método para reproducirla.
 - **El corpus se muestrea con fechas espaciadas**, por la republicación de avisos.
   Ver arriba: es la diferencia entre 38% y 1% de duplicados.
+- **La línea base no es un modelo barato: es un parser sin IA.** `v0-reglas`
+  extrae con expresiones regulares, a costo cero y latencia despreciable. Ubica
+  los campos estructurales en el **95%** de los avisos de formato COMPR.AR y en
+  el **51%** de los de formato libre. Cualquier modelo tiene que justificar su
+  costo contra esa vara, y sólo en el segmento donde la diferencia existe. La
+  pregunta del proyecto deja de ser "qué modelo anda mejor" y pasa a ser **dónde
+  se justifica pagar por un modelo**.
 - `COMPLETAR`

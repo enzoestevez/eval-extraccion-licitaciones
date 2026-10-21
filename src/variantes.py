@@ -8,8 +8,12 @@ Regla de oro: si cambias el prompt Y el modelo entre dos variantes, no aprendist
 nada de las dos. Aprendiste que "esta combinacion anda mejor que esa", que es una
 conclusion mucho mas pobre y no se puede transferir.
 
-Los nombres de modelo de abajo son PLACEHOLDERS. Completalos con los identificadores
-vigentes de la documentacion de cada proveedor antes de correr.
+IMPORTANTE - los identificadores de modelo caducan. Google dejo de ofrecer
+gemini-2.5-flash-lite a cuentas nuevas y la corrida fallaba con un 404 en las 267
+llamadas. No copies identificadores de ningun lado: preguntale a TU clave cuales
+tiene habilitados y pone esos.
+
+    python src/verificar.py --modelos
 """
 
 from __future__ import annotations
@@ -87,25 +91,32 @@ VARIANTES: tuple[Variante, ...] = (
         PROMPT_MINIMO,
         nota="Linea base sin proveedor. Sirve para probar el pipeline sin gastar.",
     ),
+    Variante(
+        "v0-reglas",
+        "reglas",
+        "regex",
+        "",
+        nota="Extractor determinista sin IA. Costo cero. La vara a superar.",
+    ),
     # --- efecto del prompt, con el modelo fijo -----------------------------
     Variante(
         "v1-minimo",
         "google",
-        "COMPLETAR-MODELO-BARATO",
+        "gemini-3.5-flash-lite",
         PROMPT_MINIMO,
         nota="Prompt sin reglas. Es el piso: cuanto se saca sin trabajo.",
     ),
     Variante(
         "v2-reglas",
         "google",
-        "COMPLETAR-MODELO-BARATO",
+        "gemini-3.5-flash-lite",
         PROMPT_CON_REGLAS,
         nota="Mismo modelo, prompt con reglas. Aisla el efecto del prompt.",
     ),
     Variante(
         "v3-ejemplos",
         "google",
-        "COMPLETAR-MODELO-BARATO",
+        "gemini-3.5-flash-lite",
         PROMPT_CON_EJEMPLOS,
         nota="Mismo modelo, reglas mas un ejemplo resuelto.",
     ),
@@ -113,14 +124,14 @@ VARIANTES: tuple[Variante, ...] = (
     Variante(
         "v4-modelo-caro",
         "google",
-        "COMPLETAR-MODELO-CARO",
+        "gemini-3.5-flash",
         PROMPT_CON_EJEMPLOS,
-        nota="Mismo prompt que v3, modelo mas caro. Aisla el efecto del modelo.",
+        nota="Mismo prompt que v3, modelo mas caro de la misma familia. Aisla el efecto del modelo.",
     ),
     Variante(
         "v5-otro-proveedor",
         "anthropic",
-        "COMPLETAR-MODELO",
+        "claude-haiku-4-5-20251001",
         PROMPT_CON_EJEMPLOS,
         nota="Mismo prompt que v3, otro proveedor.",
     ),

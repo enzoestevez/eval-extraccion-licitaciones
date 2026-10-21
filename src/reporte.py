@@ -38,6 +38,18 @@ def main() -> None:
     if not vs:
         sys.exit("metricas.json no tiene variantes evaluadas.")
 
+    # Cobertura completa = evaluada sobre TODO el set etiquetado. Lo demas no se
+    # compara, y sobre todo no gana.
+    n_total = m["n_etiquetados"]
+    completas = [v for v in vs if v["n_documentos"] == n_total]
+    incompletas = [v for v in vs if v["n_documentos"] != n_total]
+    if not completas:
+        sys.exit(
+            f"Ninguna variante tiene los {n_total} documentos del set etiquetado.\n"
+            "Completa al menos una con src/extraer.py antes de generar el reporte: "
+            "un ranking entre muestras distintas no dice nada."
+        )
+
     L: list[str] = []
     L.append("# Resultados\n")
     L.append(
@@ -52,17 +64,43 @@ def main() -> None:
     # --- tabla principal ---------------------------------------------------
     L.append("## Comparacion de variantes\n")
     L.append(
-        "| Variante | Precision | Docs perfectos | Alucinacion | p95 latencia | USD/doc | Que cambia |"
+        "| Variante | n | Precision | Docs perfectos | Alucinacion | p95 latencia | USD/doc | Que cambia |"
     )
-    L.append("|---|---:|---:|---:|---:|---:|---|")
+    L.append("|---|---:|---:|---:|---:|---:|---:|---|")
     for v in vs:
         nota = POR_ID[v["variante"]].nota if v["variante"] in POR_ID else ""
+        marca = "" if v["n_documentos"] == n_total else " ⚠"
         L.append(
-            f"| `{v['variante']}` | {pct(v['precision_ponderada'])} | "
+            f"| `{v['variante']}` | {v['n_documentos']}{marca} | {pct(v['precision_ponderada'])} | "
             f"{pct(v['docs_perfectos'])} | {pct(v['tasa_alucinacion'])} | "
             f"{v['latencia_p95_ms']} ms | {usd(v['costo_por_doc_usd'])} | {nota} |"
         )
     L.append("")
+
+    # LA COLUMNA n NO ES DECORATIVA. Una variante evaluada sobre menos
+    # documentos que otra no se puede comparar con ella: no es la misma prueba.
+    # Esta tabla llego a coronar `v4-modelo-caro` con 83,9% sobre 53 documentos
+    # contra `v3-ejemplos` con 83,5% sobre 115, y la diferencia de 0,4 puntos no
+    # significaba nada. El dato estaba en metricas.json (`n_documentos` y
+    # `errores_llamada`); el reporte no lo mostraba, que es peor que no tenerlo.
+    if incompletas:
+        L.append(
+            f"> **No comparables.** {len(incompletas)} "
+            f"{'variante tiene' if len(incompletas) == 1 else 'variantes tienen'} "
+            f"menos de {n_total} documentos evaluados, marcadas con ⚠:\n"
+        )
+        for v in incompletas:
+            L.append(
+                f"> - `{v['variante']}`: **{v['n_documentos']} de {n_total}** "
+                f"({v['errores_llamada']} llamadas fallidas). Su precision esta "
+                f"calculada sobre otro subconjunto, mas chico, y no se puede poner "
+                f"al lado de las demas."
+            )
+        L.append(
+            ">\n> Para completarla: `python src/extraer.py --variante <id>`, que es "
+            "reanudable y sólo pide los documentos que faltan. **Hasta entonces esa "
+            "fila no entra en ninguna conclusion.**\n"
+        )
     L.append(
         "**Precision** es el promedio ponderado por campo (los pesos estan en `src/esquema.py`). "
         "**Docs perfectos** es el porcentaje de documentos sin un solo campo mal — es la metrica "
@@ -71,7 +109,8 @@ def main() -> None:
         "era `null`; en produccion es el error mas caro y por eso va aparte.\n"
     )
 
-    ganadora = vs[0]
+    # La ganadora sale SOLO de las variantes con cobertura completa.
+    ganadora = completas[0]
 
     # --- por campo ---------------------------------------------------------
     L.append(f"## Donde se equivoca la mejor variante (`{ganadora['variante']}`)\n")

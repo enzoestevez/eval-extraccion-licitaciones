@@ -1,6 +1,12 @@
 pypdf>=5.1.0
 
 # Instala SOLO el proveedor que vayas a usar. No hace falta tenerlos todos.
+# Las variantes v1 a v4 usan Google; la v5 usa Anthropic.
+#
+#   pip install google-genai      # para v1-minimo, v2-reglas, v3-ejemplos, v4-modelo-caro
+#   pip install anthropic         # para v5-otro-proveedor
+#
+# Despues corre `python src/verificar.py` para confirmar que quedo todo bien.
+# google-genai>=0.8.0
 # anthropic>=0.40.0
 # openai>=1.60.0
-# google-genai>=0.8.0

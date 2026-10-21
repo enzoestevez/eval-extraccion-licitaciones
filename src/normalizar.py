@@ -92,8 +92,12 @@ _FORMATOS = (
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",
     "%Y-%m-%d",
+    # El Boletin escribe las fechas asi, con segundos: "28/08/2026 10:00:00".
+    "%d/%m/%Y %H:%M:%S",
     "%d/%m/%Y %H:%M",
     "%d/%m/%Y",
+    "%d-%m-%Y %H:%M:%S",
+    "%d-%m-%Y %H:%M",
     "%d-%m-%Y",
 )
 

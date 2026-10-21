@@ -13,6 +13,21 @@ La repartición contratante tal como aparece en el aviso, sin expandir siglas ni
 corregir. Si figuran dos niveles (ministerio y dirección), se etiqueta el más
 específico que aparezca como contratante.
 
+**No incluye el rubro del Boletín.** Si la primera línea del aviso es una
+categoría del índice —`LIMPIEZA`, `EFECTOS VARIOS`, `PRODUCTOS ALIMENTICIOS`,
+`VIALES`, `CIVILES`— esa línea no es el organismo: es el rubro, que se colaba al
+cortar el boletín. Salteala y tomá la siguiente.
+
+La lista completa de rubros está en `label/limpiar.py`, extraída de los sumarios
+de las cinco ediciones del corpus. Un prefijo que no esté en esa lista **sí** es
+parte del nombre: `ADMINISTRACIÓN DE INFRAESTRUCTURAS FERROVIARIAS S.A.` es un
+organismo entero, no un rubro más un organismo.
+
+**Y el organismo termina donde empieza otra cosa.** Si la captura siguió hasta
+`Licitación Pública...`, `OBJETO:`, `Expediente` o `UOC:`, hay que cortarla ahí.
+Ese recorte es criterio y se hace a mano: `label/limpiar.py` los lista pero no
+los toca.
+
 - Si el aviso dice "MINISTERIO DE SALUD - DIRECCIÓN DE COMPRAS" → la dirección.
 - Si sólo dice el ministerio → el ministerio.
 
@@ -28,6 +43,14 @@ Si el aviso trae sólo uno de los dos, el otro va `null`.
 Literal del aviso: "Licitación Pública", "Contratación Directa", "Concurso de
 Precios", "Licitación Privada", "Subasta Pública". Sin agregar modalidad
 ("Etapa Única", "Nacional") salvo que sea parte inseparable del nombre.
+
+**No lleva el número.** `Licitación Pública 0023/2026` se etiqueta como
+`Licitación Pública`; el `0023/2026` va en `numero_procedimiento`. Tampoco lleva
+el identificador interno del organismo: `Licitación Pública LPU-2026-SC-023` es
+`Licitación Pública`.
+
+> Esta regla salió del doble ciego. 18 de 115 etiquetas tenían el número pegado
+> al tipo, y era el campo con peor coincidencia entre las dos pasadas: 50%.
 
 ### `numero_procedimiento`
 Habitualmente `NN/AAAA`. Copiá el formato del aviso. Si dice "Nº 14/26",
@@ -78,6 +101,28 @@ Marcalo con `!` y escribí por qué siempre que:
 Los dudosos **se quedan en el set** pero se reportan aparte. Si son más del 10%
 del corpus, eso es un hallazgo del proyecto, no un problema a esconder: significa
 que la tarea tiene ambigüedad irreducible y que ningún modelo va a llegar al 100%.
+
+## Etiquetado asistido: cómo usarlo sin arruinar el set
+
+La herramienta precarga valores con `src/reglas.py` (un parser de expresiones
+regulares, sin IA). Controles:
+
+- **Enter** acepta la sugerencia. Si no hay sugerencia, Enter es `null`.
+- **`-`** fuerza `null` cuando hay una sugerencia en pantalla.
+- **`?`** vuelve a mostrar el aviso. **`.`** saltea el documento.
+
+La regla de oro es una sola: **mirá el texto antes de apretar Enter.** La
+sugerencia es un candidato, no una respuesta. El campo donde más se cuela el
+error es `objeto`, porque es largo y "parece bien" de un vistazo aunque le falte
+la última línea.
+
+Uno de cada siete avisos aparece marcado `[ciego]` y va sin sugerencias. No lo
+saltees ni lo apures: es la muestra que después demuestra que no estuviste
+apretando Enter en piloto automático.
+
+Con `python label/etiquetar.py --estado` mirás tu tasa de corrección. Si te da
+0% después de 30 avisos, no es que el parser sea perfecto: es que no estás
+leyendo.
 
 ## Control de calidad del propio set
 
