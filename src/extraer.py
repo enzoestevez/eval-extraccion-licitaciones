@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -86,6 +87,27 @@ def ya_hechos(destino: Path) -> set[str]:
 ESPERAS = (5, 15, 40, 90)  # segundos entre reintentos
 
 
+# LA ESPERA QUE PIDE EL PROVEEDOR, LEIDA DEL ERROR.
+# Google la dice textual: "Please retry in 9h21m26.597663521s". Ignorarla y
+# esperar 90 segundos no es optimismo, es quemar cupo: cada reintento cuenta
+# como pedido contra el limite que ya se agoto.
+RX_ESPERA = re.compile(
+    r"retry\s+in\s+(?:(\d+)\s*h)?\s*(?:(\d+)\s*m)?\s*(?:([\d.]+)\s*s)?", re.I
+)
+ESPERA_MAXIMA = 120.0  # segundos. Mas que esto no es transitorio, es otro dia.
+
+
+def espera_pedida(error: str | None) -> float | None:
+    """Segundos que el proveedor pide esperar, o None si no lo dice."""
+    if not error:
+        return None
+    m = RX_ESPERA.search(error)
+    if not m or not any(m.groups()):
+        return None
+    h, mi, se = m.groups()
+    return int(h or 0) * 3600 + int(mi or 0) * 60 + float(se or 0)
+
+
 def es_transitorio(error: str | None) -> bool:
     """¿Este error puede desaparecer solo si espero y vuelvo a intentar?
 
@@ -103,6 +125,16 @@ def es_transitorio(error: str | None) -> bool:
     """
     if not error:
         return False
+
+    # Si el proveedor pide esperar mas de ESPERA_MAXIMA, no es transitorio en
+    # ningun sentido util: reintentar en 90 segundos un error que pide 9 horas
+    # falla seguro Y consume un pedido del cupo agotado. Fue lo que paso en la
+    # corrida de v4-modelo-caro del 21/10: 244 reintentos inutiles para ganar
+    # UN documento.
+    pedida = espera_pedida(error)
+    if pedida is not None and pedida > ESPERA_MAXIMA:
+        return False
+
     e = error.lower()
     return any(
         s in e
@@ -183,6 +215,20 @@ def correr(v: Variante, limite: int | None, solo_etiquetados: bool, pausa: float
             r = llamar_con_reintentos(v, texto)
             if pausa:
                 time.sleep(pausa)
+
+            # PARED DE CUOTA: cortar la corrida, no seguir documento por documento.
+            # Cada llamada siguiente fallaria igual y gastaria un pedido del cupo
+            # agotado. La corrida es reanudable, asi que cortar no pierde nada.
+            pedida = espera_pedida(r.error)
+            if pedida is not None and pedida > ESPERA_MAXIMA:
+                horas = pedida / 3600
+                print(f"\n  PARED DE CUOTA · el proveedor pide esperar "
+                      f"{horas:.1f} h ({pedida:.0f} s).")
+                print(f"  {r.error.strip()[:160]}")
+                print(f"  Corto acá con {len(pendientes) - n + 1} documentos sin hacer.")
+                print(f"  Volvé a correr el mismo comando cuando pase: es reanudable.")
+                break
+
             if r.error:
                 fallos += 1
             f.write(

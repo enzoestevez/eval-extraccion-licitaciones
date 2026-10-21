@@ -112,6 +112,67 @@ def main() -> None:
     # La ganadora sale SOLO de las variantes con cobertura completa.
     ganadora = completas[0]
 
+    # --- comparacion emparejada -------------------------------------------
+    # Sin esto, la tabla de arriba invita a comparar 61 documentos contra 115.
+    emp = m.get("emparejadas") or []
+    n_emp = m.get("n_emparejado") or 0
+    if emp and n_emp and n_emp < n_total:
+        L.append(f"## Comparación emparejada · los mismos {n_emp} documentos\n")
+        L.append(
+            f"La tabla de arriba da a cada variante su propio `n`, y eso impide "
+            f"compararlas entre si. **`v4-modelo-caro` tiene {n_total - n_emp} "
+            f"documentos menos** porque la capa gratuita permite **20 llamadas por "
+            f"día** a ese modelo: completarla serían tres días de cupo.\n"
+        )
+        L.append(
+            f"La solución no es gastar tres días. Es medir **todas** las variantes "
+            f"sobre los mismos {n_emp} documentos —la intersección donde todas "
+            f"tienen extracción válida—. Las predicciones ya estaban guardadas, así "
+            f"que **la comparación válida salió a costo cero.**\n"
+        )
+        L.append("| Variante | Precisión | Docs perfectos | Alucinación | USD/doc |")
+        L.append("|---|---:|---:|---:|---:|")
+        orden = sorted(emp, key=lambda x: -x["precision_ponderada"])
+        for v_ in orden:
+            L.append(f"| `{v_['variante']}` | {pct(v_['precision_ponderada'])} | "
+                     f"{pct(v_['docs_perfectos'])} | {pct(v_['tasa_alucinacion'])} | "
+                     f"{usd(v_['costo_por_doc_usd'])} |")
+        L.append("")
+
+        por = {v_["variante"]: v_ for v_ in emp}
+        caro, barato = por.get("v4-modelo-caro"), por.get("v3-ejemplos")
+        if caro and barato:
+            dp = (caro["precision_ponderada"] - barato["precision_ponderada"]) * 100
+            dd = (caro["docs_perfectos"] - barato["docs_perfectos"]) * 100
+            veces = (caro["costo_por_doc_usd"] / barato["costo_por_doc_usd"]
+                     if barato["costo_por_doc_usd"] else None)
+            L.append(
+                f"**El efecto del modelo, por fin medido sobre la misma prueba:** el "
+                f"modelo caro gana **{dp:+.1f} puntos de precisión** y "
+                f"**{dd:+.1f} puntos de documentos perfectos**"
+                + (f", a **{veces:.1f}× el costo**" if veces else "") + ".\n"
+            )
+            L.append(
+                "Y la métrica que decide no es la precisión: es **documentos "
+                "perfectos**. El sistema que consume esto "
+                "([proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)) "
+                "arma una llave con varios campos — un error en "
+                "`numero_procedimiento` no degrada el caso, lo **mata**. Con ese "
+                f"criterio la diferencia no es de {dp:.1f} puntos sino de {dd:.1f}, "
+                "y ahí la discusión del costo cambia.\n"
+            )
+        reglas = por.get("v0-reglas")
+        if reglas and barato and reglas["docs_perfectos"] > barato["docs_perfectos"]:
+            L.append(
+                f"**Un detalle que la tabla global escondía:** `v0-reglas`, sin IA y "
+                f"a costo cero, tiene **más documentos perfectos** que `v3-ejemplos` "
+                f"({pct(reglas['docs_perfectos'])} contra {pct(barato['docs_perfectos'])}) "
+                f"con {(barato['precision_ponderada'] - reglas['precision_ponderada'])*100:.1f} "
+                f"puntos menos de precisión. El parser determinista acierta el "
+                f"documento entero más seguido, pero cuando falla falla en más campos "
+                f"a la vez. Dos perfiles de error distintos que un promedio junta.\n"
+            )
+
     # --- por formato: el hallazgo central del proyecto ---------------------
     # Un promedio unico no se puede interpretar, porque cada formato tiene su
     # propio techo humano medido por doble ciego. Esta tabla pone cada numero al

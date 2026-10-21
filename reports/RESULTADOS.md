@@ -6,7 +6,7 @@ Set etiquetado: **115 documentos** · esquema v1.1.0
 
 | Variante | n | Precision | Docs perfectos | Alucinacion | p95 latencia | USD/doc | Que cambia |
 |---|---:|---:|---:|---:|---:|---:|---|
-| `v4-modelo-caro` | 53 ⚠ | 83.9% | 32.1% | 2.8% | 46294 ms | 0.002858 | Mismo prompt que v3, modelo mas caro de la misma familia. Aisla el efecto del modelo. |
+| `v4-modelo-caro` | 61 ⚠ | 84.4% | 36.1% | 2.7% | 35188 ms | 0.002844 | Mismo prompt que v3, modelo mas caro de la misma familia. Aisla el efecto del modelo. |
 | `v3-ejemplos` | 115 | 83.5% | 31.3% | 2.9% | 37442 ms | 0.000751 | Mismo modelo, reglas mas un ejemplo resuelto. |
 | `v1-minimo` | 115 | 83.2% | 30.4% | 3.7% | 20032 ms | 0.000622 | Prompt sin reglas. Es el piso: cuanto se saca sin trabajo. |
 | `v2-reglas` | 115 | 83.1% | 27.8% | 2.6% | 4966 ms | 0.000681 | Mismo modelo, prompt con reglas. Aisla el efecto del prompt. |
@@ -15,11 +15,32 @@ Set etiquetado: **115 documentos** · esquema v1.1.0
 
 > **No comparables.** 1 variante tiene menos de 115 documentos evaluados, marcadas con ⚠:
 
-> - `v4-modelo-caro`: **53 de 115** (62 llamadas fallidas). Su precision esta calculada sobre otro subconjunto, mas chico, y no se puede poner al lado de las demas.
+> - `v4-modelo-caro`: **61 de 115** (54 llamadas fallidas). Su precision esta calculada sobre otro subconjunto, mas chico, y no se puede poner al lado de las demas.
 >
 > Para completarla: `python src/extraer.py --variante <id>`, que es reanudable y sólo pide los documentos que faltan. **Hasta entonces esa fila no entra en ninguna conclusion.**
 
 **Precision** es el promedio ponderado por campo (los pesos estan en `src/esquema.py`). **Docs perfectos** es el porcentaje de documentos sin un solo campo mal — es la metrica dura, la que importa si el registro se carga entero o no se carga. **Alucinacion** es la proporcion de campos donde el modelo puso un valor y la verdad era `null`; en produccion es el error mas caro y por eso va aparte.
+
+## Comparación emparejada · los mismos 61 documentos
+
+La tabla de arriba da a cada variante su propio `n`, y eso impide compararlas entre si. **`v4-modelo-caro` tiene 54 documentos menos** porque la capa gratuita permite **20 llamadas por día** a ese modelo: completarla serían tres días de cupo.
+
+La solución no es gastar tres días. Es medir **todas** las variantes sobre los mismos 61 documentos —la intersección donde todas tienen extracción válida—. Las predicciones ya estaban guardadas, así que **la comparación válida salió a costo cero.**
+
+| Variante | Precisión | Docs perfectos | Alucinación | USD/doc |
+|---|---:|---:|---:|---:|
+| `v4-modelo-caro` | 84.4% | 36.1% | 2.7% | 0.002844 |
+| `v3-ejemplos` | 81.9% | 27.9% | 3.3% | 0.000738 |
+| `v2-reglas` | 81.2% | 24.6% | 2.9% | 0.000670 |
+| `v1-minimo` | 80.8% | 24.6% | 4.1% | 0.000611 |
+| `v0-reglas` | 72.5% | 31.1% | 0.2% | 0.000000 |
+| `v0-base` | 17.9% | 0.0% | 0.0% | — |
+
+**El efecto del modelo, por fin medido sobre la misma prueba:** el modelo caro gana **+2.5 puntos de precisión** y **+8.2 puntos de documentos perfectos**, a **3.9× el costo**.
+
+Y la métrica que decide no es la precisión: es **documentos perfectos**. El sistema que consume esto ([proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)) arma una llave con varios campos — un error en `numero_procedimiento` no degrada el caso, lo **mata**. Con ese criterio la diferencia no es de 2.5 puntos sino de 8.2, y ahí la discusión del costo cambia.
+
+**Un detalle que la tabla global escondía:** `v0-reglas`, sin IA y a costo cero, tiene **más documentos perfectos** que `v3-ejemplos` (31.1% contra 27.9%) con 9.5 puntos menos de precisión. El parser determinista acierta el documento entero más seguido, pero cuando falla falla en más campos a la vez. Dos perfiles de error distintos que un promedio junta.
 
 ## El promedio unico no sirve: hay que partir por formato
 

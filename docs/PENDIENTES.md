@@ -208,3 +208,20 @@ cómo se fue llenando es parte de lo que muestra que el trabajo lo hiciste vos.
       normalizados y no sobre strings
 - [ ] Podés explicar por qué un `null` acertado cuenta como acierto
 - [ ] Podés defender los pesos de `esquema.py` frente a alguien que proponga otros
+
+## 22/10/2026 · registrar QUE modelo contesto
+
+Las predicciones guardan el modelo que se PIDIO, no el que contesto. El 429 de
+la corrida de v4 del 21/10 llego atribuido a `gemini-3.6-flash`, pero
+`variantes.py` pide `gemini-3.5-flash`: el proveedor enruta a otro modelo y el
+experimento no se entera.
+
+Es el capitulo siguiente de la leccion que ya esta en el README (los
+identificadores caducan): **no solo caducan, el proveedor puede contestar con
+otro modelo, y si no se registra cual, no se puede saber.**
+
+Arreglo: en `proveedores.py`, leer el identificador que devuelve la respuesta
+(`model_version` en el SDK de Google) y guardarlo en cada registro de
+prediccion junto al pedido. Si difieren, `evaluar.py` tiene que avisarlo: una
+comparacion entre variantes que en realidad corrieron en el mismo modelo no
+mide el efecto del modelo.

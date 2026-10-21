@@ -144,9 +144,34 @@ def resumen(docs: list[dict], n_campos: int) -> dict:
     }
 
 
-def evaluar_variante(variante_id: str, oro: dict[str, dict]) -> dict | None:
+def ids_validos(variante_id: str, oro: dict[str, dict]) -> set[str]:
+    """Documentos del set de oro donde ESTA variante tiene una extraccion usable.
+
+    Un registro con `error` no es una extraccion: la llamada no volvio. Contarlo
+    como documento evaluado mezclaria "el modelo se equivoco" con "el modelo no
+    contesto", que son cosas distintas y se arreglan distinto.
+    """
     pred = cargar_jsonl(INTERMEDIO / f"pred_{variante_id}.jsonl")
-    comunes = sorted(set(oro) & set(pred))
+    return {i for i, r in pred.items() if i in oro and not r.get("error")}
+
+
+def evaluar_variante(variante_id: str, oro: dict[str, dict],
+                     solo: set[str] | None = None) -> dict | None:
+    """Metricas de una variante. Con `solo`, restringido a esos documentos.
+
+    `solo` existe para la COMPARACION EMPAREJADA. `v4-modelo-caro` tiene 61 de
+    115 documentos porque la capa gratuita permite 20 llamadas por DIA a ese
+    modelo, asi que su 84,4% no se puede poner al lado del 83,5% de una variante
+    medida sobre 115: no es la misma prueba.
+
+    La solucion no es gastar tres dias de cupo. Es medir TODAS las variantes
+    sobre los mismos documentos — los 61 donde todas tienen extraccion valida.
+    Las predicciones ya estaban guardadas, asi que la comparacion valida salio a
+    costo cero. Es la misma idea que `reprocesar.py` del proyecto 02: separar lo
+    que ya se pago de lo que hay que volver a calcular.
+    """
+    pred = cargar_jsonl(INTERMEDIO / f"pred_{variante_id}.jsonl")
+    comunes = sorted(set(oro) & set(pred) & solo) if solo is not None else sorted(set(oro) & set(pred))
     if not comunes:
         return None
 
@@ -301,10 +326,40 @@ def main() -> None:
             f"alucinacion {r['tasa_alucinacion']:.2%}{costo}"
         )
 
+    # ---------------------------------------------------- comparacion emparejada
+    # Las variantes NO tienen la misma cobertura: la capa gratuita permite 20
+    # llamadas por dia al modelo de v4, asi que esa variante tiene 61 de 115
+    # documentos. Comparar 61 contra 115 no es comparar.
+    #
+    # Se evalua todo de nuevo sobre la INTERSECCION: los documentos donde todas
+    # las variantes tienen extraccion valida. Costo cero, porque las predicciones
+    # ya estaban guardadas.
+    comun = set(oro)
+    for vid in ids:
+        comun &= ids_validos(vid, oro)
+
+    emparejadas = []
+    if comun and len(comun) < len(oro):
+        print(f"\nCOMPARACION EMPAREJADA · los mismos {len(comun)} documentos para todas")
+        print("  (la interseccion donde todas las variantes tienen extracción válida)\n")
+        for vid in ids:
+            r = evaluar_variante(vid, oro, solo=comun)
+            if r:
+                emparejadas.append(r)
+        for r in sorted(emparejadas, key=lambda x: -x["precision_ponderada"]):
+            print(f"  {r['variante']:22} precision {r['precision_ponderada']:.1%} | "
+                  f"perfectos {r['docs_perfectos']:.1%} | "
+                  f"alucinacion {r['tasa_alucinacion']:.2%}")
+
     REPORTES.mkdir(parents=True, exist_ok=True)
     salida = REPORTES / "metricas.json"
     salida.write_text(
-        json.dumps({"n_etiquetados": len(oro), "variantes": resultados}, ensure_ascii=False, indent=2),
+        json.dumps({
+            "n_etiquetados": len(oro),
+            "variantes": resultados,
+            "n_emparejado": len(comun) if comun else 0,
+            "emparejadas": emparejadas,
+        }, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     print(f"\nEscrito {salida.relative_to(RAIZ)}")
