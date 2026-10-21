@@ -80,7 +80,7 @@ sola con `src/reporte.py`, desde `reports/metricas.json`.
 | `v1-minimo` | 115 | 83,2% | 93,0% | 73,2% | 30,4% | 3,7% | 0,000622 |
 | `v2-reglas` | 115 | 83,1% | 92,7% | 73,2% | 27,8% | 2,6% | 0,000681 |
 | `v0-reglas` *(sin IA)* | 115 | 71,0% | 89,5% | 52,1% | 27,0% | **0,4%** | **0** |
-| `v4-modelo-caro` | **61** ⚠ | 84,4% | 97,0% | 73,9% | 36,1% | 2,7% | 0,002844 |
+| `v4-modelo-caro` | **61** ⚠ | 84,4% | 96,7% | 73,3% | 36,1% | 2,7% | 0,002844 |
 
 `v4-modelo-caro` está marcada porque tiene 61 de 115 documentos: su precisión
 está calculada sobre otro subconjunto y **no entra en esta tabla como
