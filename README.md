@@ -1,94 +1,102 @@
-# Extracción de datos de avisos de contratación pública — banco de evaluación
+# Extracting data from public procurement notices — an evaluation harness
 
-> **El número, y por qué el número no es el resultado.**
+*English · [Español](README.es.md)*
+*Part 1 of 3 — see [the chain](#the-chain) at the bottom.*
+
+> **The number, and why the number is not the result.**
 >
-> 83,5% de precisión ponderada por campo sobre **115 avisos etiquetados a mano**,
-> a USD 0,00075 por documento. Pero ese promedio no se puede interpretar:
+> 83.5% field-weighted accuracy over **115 hand-labeled notices**, at USD 0.00075
+> per document. But that average cannot be interpreted:
 >
-> | | Precisión | Techo humano medido | |
+> | | Accuracy | Measured human ceiling | |
 > |---|---:|---:|---|
-> | Formato COMPR.AR | **93,5%** | 98,7% | quedan 5,2 puntos |
-> | Formato libre | **73,2%** | 72,7% | **ya está en el techo** |
+> | COMPR.AR format | **93.5%** | 98.7% | 5.2 points to go |
+> | Free-form | **73.2%** | 72.7% | **already at the ceiling** |
 >
-> **En la mitad difícil el modelo alcanzó la consistencia de una persona**, y
-> ninguna versión del prompt lo mueve: tres prompts distintos dan 73,2% los tres.
-> Lo que queda de error no es una limitación del modelo, es que el documento no
-> trae la respuesta.
+> **On the hard half, the model reached one person's own consistency**, and no
+> version of the prompt moves it: three different prompts return 73.2%, all
+> three. The remaining error is not a model limitation — the document does not
+> contain the answer.
 >
-> **Línea base humana:** 85,7% de precisión, 113 segundos y USD 0,058 por
-> documento, con el costo anclado al salario mínimo legal. El modelo es **77×
-> más barato y 29× más rápido**.
+> **Human baseline:** 85.7% accuracy, 113 seconds and USD 0.058 per document,
+> costed at Argentina's statutory minimum wage. The model is **77× cheaper and
+> 29× faster**.
 >
-> **Línea base sin IA:** un parser de expresiones regulares saca 89,5% en
-> COMPR.AR a costo cero. El modelo sólo le gana por 4 puntos ahí, y por 21 en
-> formato libre. **Ahí está la respuesta a dónde se justifica pagar por un
-> modelo**, que es la pregunta que el proyecto se hizo.
+> **Baseline without AI:** a regular-expression parser reaches 89.5% on COMPR.AR
+> notices at zero cost. The model only beats it by 4 points there, and by 21 on
+> free-form notices. **That is the answer to where paying for a model is
+> justified**, which is the question this project set out to ask.
 >
-> **Y el modelo caro:** +2,5 puntos de precisión, +8,2 de documentos perfectos,
-> 3,9× el costo — medido sobre los mismos 61 documentos, porque la capa gratuita
-> permite 20 pedidos por día y comparar 61 contra 115 no es comparar.
+> **And the expensive model:** +2.5 points of accuracy, +8.2 points of perfect
+> documents, at 3.9× the cost — measured over the same 61 documents, because the
+> free tier allows 20 requests per day and comparing 61 against 115 is not a
+> comparison.
 
 ---
 
-## El problema
+## The problem
 
-Los avisos de contratación pública del Boletín Oficial se publican como texto
-corrido dentro de PDFs. Quien necesita usarlos —un proveedor del Estado buscando
-oportunidades, un organismo de control, un periodista de datos— tiene que leerlos
-a mano y transcribir los campos uno por uno.
+Public procurement notices in Argentina's *Boletín Oficial* (the Official
+Gazette) are published as running text inside PDFs. Anyone who needs to use them
+— a state supplier looking for opportunities, an audit body, a data journalist —
+has to read them by hand and transcribe the fields one at a time.
 
-La pregunta que este proyecto responde no es "¿se puede automatizar con un LLM?".
-La respuesta a eso es obviamente sí, y se demuestra en diez minutos. La pregunta
-es la que hace que un piloto llegue a producción o muera en el intento:
+The question this project answers is **not** "can an LLM automate this?" The
+answer to that is obviously yes, and you can demonstrate it in ten minutes. The
+question is the one that decides whether a pilot reaches production or dies
+trying:
 
-**¿Con cuánta precisión, en qué campos se equivoca, a qué costo, y a partir de qué
-umbral de confianza conviene dejar de revisarlo a mano?**
+**At what accuracy, failing on which fields, at what cost, and above which
+confidence threshold does it stop being worth reviewing by hand?**
 
-## Cómo está medido
+## How it is measured
 
-- **Set de referencia etiquetado a mano**, contra un protocolo escrito
-  ([`docs/protocolo-etiquetado.md`](docs/protocolo-etiquetado.md)). Sin IA en el
-  etiquetado: si la verdad la genera un modelo, no se mide precisión, se mide el
-  acuerdo entre dos modelos.
-- **Etiquetado asistido por reglas, con muestra ciega de control.** Para no
-  tipear ocho campos por aviso, un parser determinista (`src/reglas.py`, sin IA)
-  precarga los valores y yo acepto o corrijo. Eso introduce **sesgo de anclaje**:
-  un valor sugerido se acepta con menos escrutinio que uno escrito de cero. Por
-  eso el **15% de los avisos se etiqueta sin ninguna sugerencia**, elegido de
-  forma determinista por su id, y cada campo guarda si fue aceptado, corregido o
-  escrito a mano. Comparar el desempeño del parser en los avisos asistidos contra
-  los ciegos mide el sesgo en puntos, en vez de dejarlo como una sospecha.
-- **Comparación normalizada**, no por igualdad de strings. `"$ 1.250.000,50"` y
-  `1250000.5` son el mismo monto. Comparar crudo mide el parser, no el modelo.
-- **Precisión ponderada por campo.** Errar el expediente no cuesta lo mismo que
-  errar el valor del pliego. Los pesos están en `src/esquema.py` y son una
-  decisión de negocio explícita, no un promedio neutro.
-- **La alucinación se reporta aparte**: campos donde el modelo puso un valor y la
-  verdad era `null`. En producción es el error más caro y diluirlo dentro de
-  "precisión" esconde justo lo que hay que mirar.
-- **Una variable por variante.** Si cambiás el prompt *y* el modelo entre dos
-  corridas, no aprendiste nada de ninguna de las dos.
+- **A hand-labeled reference set**, against a written protocol
+  ([`docs/protocolo-etiquetado.md`](docs/protocolo-etiquetado.md)). No AI in the
+  labeling: if a model generates the ground truth, you are not measuring
+  accuracy — you are measuring agreement between two models.
+- **Rule-assisted labeling with a blind control sample.** To avoid typing eight
+  fields per notice, a deterministic parser (`src/reglas.py`, no AI) pre-fills
+  the values and I accept or correct them. That introduces **anchoring bias**: a
+  suggested value gets less scrutiny than one typed from scratch. So **15% of the
+  notices are labeled with no suggestions at all**, selected deterministically by
+  document id, and every field records whether it was accepted, corrected or
+  typed from nothing. Comparing the parser's performance on assisted notices
+  against blind ones measures the bias in points instead of leaving it as a
+  suspicion.
+- **Normalized comparison**, not string equality. `"$ 1.250.000,50"` and
+  `1250000.5` are the same amount. Comparing raw strings measures the parser, not
+  the model.
+- **Field-weighted accuracy.** Getting the administrative file number wrong does
+  not cost the same as getting the price of the bidding documents wrong. The
+  weights live in `src/esquema.py` and are an explicit business decision, not a
+  neutral average.
+- **Hallucination is reported separately**: fields where the model supplied a
+  value and the truth was `null`. In production it is the most expensive error,
+  and diluting it inside "accuracy" hides exactly what you need to look at.
+- **One variable per variant.** If you change the prompt *and* the model between
+  two runs, you have learned nothing about either.
 
-## Resultados
+## Results
 
-Tabla completa en [`reports/RESULTADOS.md`](reports/RESULTADOS.md) — se genera
-sola con `src/reporte.py`, desde `reports/metricas.json`.
+Full table in [`reports/RESULTADOS.md`](reports/RESULTADOS.md) — generated by
+`src/reporte.py` from `reports/metricas.json`.
 
-| Variante | n | Precisión | COMPR.AR | Libre | Docs perfectos | Alucinación | USD/doc |
+| Variant | n | Accuracy | COMPR.AR | Free-form | Perfect docs | Hallucination | USD/doc |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `v3-ejemplos` | 115 | **83,5%** | 93,5% | 73,2% | 31,3% | 2,9% | 0,000751 |
-| `v1-minimo` | 115 | 83,2% | 93,0% | 73,2% | 30,4% | 3,7% | 0,000622 |
-| `v2-reglas` | 115 | 83,1% | 92,7% | 73,2% | 27,8% | 2,6% | 0,000681 |
-| `v0-reglas` *(sin IA)* | 115 | 71,0% | 89,5% | 52,1% | 27,0% | **0,4%** | **0** |
-| `v4-modelo-caro` | **61** ⚠ | 84,4% | 96,7% | 73,3% | 36,1% | 2,7% | 0,002844 |
+| `v3-ejemplos` | 115 | **83.5%** | 93.5% | 73.2% | 31.3% | 2.9% | 0.000751 |
+| `v1-minimo` | 115 | 83.2% | 93.0% | 73.2% | 30.4% | 3.7% | 0.000622 |
+| `v2-reglas` | 115 | 83.1% | 92.7% | 73.2% | 27.8% | 2.6% | 0.000681 |
+| `v0-reglas` *(no AI)* | 115 | 71.0% | 89.5% | 52.1% | 27.0% | **0.4%** | **0** |
+| `v4-modelo-caro` | **61** ⚠ | 84.4% | 96.7% | 73.3% | 36.1% | 2.7% | 0.002844 |
 
-`v4-modelo-caro` está marcada porque tiene 61 de 115 documentos: su precisión
-está calculada sobre otro subconjunto y **no entra en esta tabla como
-conclusión**. El reporte la marca solo y elige la variante ganadora únicamente
-entre las que tienen cobertura completa.
+`v4-modelo-caro` is flagged because it covers 61 of 115 documents: its accuracy
+is computed over a different subset and **does not enter this table as a
+conclusion**. The report flags it on its own and picks the winning variant only
+among those with complete coverage.
 
-**Por qué le faltan 54 documentos, y por qué no se completó.** La capa gratuita
-permite **20 pedidos por día** a ese modelo:
+**Why 54 documents are missing, and why it was not completed.** The free tier
+allows **20 requests per day** on that model:
 
 ```
 Quota exceeded for metric: generate_content_free_tier_requests,
@@ -96,283 +104,306 @@ limit: 20, model: gemini-3.6-flash
 Please retry in 9h21m26.597663521s
 ```
 
-Completarla serían tres días de cupo. **Pero la pregunta se contesta sin gastar
-nada** — ver la sección siguiente.
+Completing it would be three days of quota. **But the question can be answered
+without spending anything** — see the next section.
 
-### Comparación emparejada: el efecto del modelo, sobre la misma prueba
+### Matched comparison: the model effect, on the same test
 
-La comparación válida nunca fue 61 contra 115. Es medir **todas** las variantes
-sobre los **mismos 61 documentos**: la intersección donde todas tienen extracción
-válida. Las predicciones ya estaban guardadas, así que **la comparación salió a
-costo cero.**
+The valid comparison was never 61 against 115. It is measuring **every** variant
+over the **same 61 documents**: the intersection where all of them have a valid
+extraction. The predictions were already stored, so **the comparison cost
+nothing.**
 
-| Variante | Precisión | Docs perfectos | Alucinación | USD/doc |
+| Variant | Accuracy | Perfect docs | Hallucination | USD/doc |
 |---|---:|---:|---:|---:|
-| `v4-modelo-caro` | **84,4%** | **36,1%** | 2,7% | 0,002844 |
-| `v3-ejemplos` | 81,9% | 27,9% | 3,3% | 0,000738 |
-| `v2-reglas` | 81,2% | 24,6% | 2,9% | 0,000670 |
-| `v1-minimo` | 80,8% | 24,6% | 4,1% | 0,000611 |
-| `v0-reglas` *(sin IA)* | 72,5% | **31,1%** | **0,2%** | **0** |
+| `v4-modelo-caro` | **84.4%** | **36.1%** | 2.7% | 0.002844 |
+| `v3-ejemplos` | 81.9% | 27.9% | 3.3% | 0.000738 |
+| `v2-reglas` | 81.2% | 24.6% | 2.9% | 0.000670 |
+| `v1-minimo` | 80.8% | 24.6% | 4.1% | 0.000611 |
+| `v0-reglas` *(no AI)* | 72.5% | **31.1%** | **0.2%** | **0** |
 
-**El modelo caro gana +2,5 puntos de precisión y +8,2 de documentos perfectos, a
-3,9× el costo.**
+**The expensive model gains +2.5 points of accuracy and +8.2 points of perfect
+documents, at 3.9× the cost.**
 
-Y la métrica que decide **no es la precisión: son los documentos perfectos.** El
-sistema que consume esta extracción
-([proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)) arma
-una llave con varios campos — un error en `numero_procedimiento` no degrada el
-caso, lo **mata**. Con ese criterio la diferencia no es de 2,5 puntos sino de
-8,2, y ahí la discusión del costo cambia de signo.
+And the metric that decides **is not accuracy — it is perfect documents.** The
+system that consumes this extraction
+([project 02](https://github.com/enzoestevez/conciliador-contrataciones)) builds
+a lookup key out of several fields: an error in `numero_procedimiento` does not
+degrade the case, it **kills** it. By that criterion the difference is not 2.5
+points but 8.2, and the cost argument changes sign.
 
-**Y un detalle que el promedio global escondía:** `v0-reglas`, sin IA y gratis,
-tiene **más documentos perfectos que `v3-ejemplos`** (31,1% contra 27,9%) con 9,5
-puntos menos de precisión. El parser determinista acierta el documento entero más
-seguido, pero cuando falla, falla en más campos a la vez. **Son dos perfiles de
-error distintos que un promedio junta en un solo número.**
+**And a detail the global average was hiding:** `v0-reglas`, with no AI and at
+zero cost, gets **more perfect documents than `v3-ejemplos`** (31.1% against
+27.9%) with 9.5 points less accuracy. The deterministic parser gets the whole
+document right more often, but when it fails it fails on more fields at once.
+**Two different error profiles that an average collapses into one number.**
 
-**Tres cosas que este cuadro dice y un promedio no diría:**
+**Three things this table says and an average would not:**
 
-1. **Todo el eje de ingeniería de prompt vale 0,3 puntos** (83,2% sin reglas
-   contra 83,5% con reglas y un ejemplo resuelto), y **cero** en el formato
-   difícil, donde las tres variantes dan 73,2% exacto. El trabajo que movió la
-   aguja fue medir el techo, no escribir el prompt.
-2. **La alucinación se parte igual que la precisión:** 0,0% en COMPR.AR y 5,9%
-   en formato libre. El modelo inventa justo donde el documento no tiene el dato,
-   que es el error más caro en producción.
-3. **El parser sin IA alucina nueve veces menos** (0,4% contra 2,9%) y en
-   COMPR.AR está a 4 puntos del modelo, gratis.
+1. **The entire prompt-engineering axis is worth 0.3 points** (83.2% with no
+   rules against 83.5% with rules and a worked example), and **zero** on the hard
+   format, where all three variants return exactly 73.2%. What moved the needle
+   was measuring the ceiling, not writing the prompt.
+2. **Hallucination splits the same way accuracy does:** 0.0% on COMPR.AR and 5.9%
+   on free-form. The model invents values exactly where the document does not
+   have them, which is the most expensive error in production.
+3. **The parser with no AI hallucinates seven times less** (0.4% against 2.9%)
+   and on COMPR.AR sits 4 points behind the model, for free.
 
-### La confianza que el modelo se autoasigna no sirve para rutear
+### The model's self-reported confidence is useless for routing
 
-| Umbral | Auto-procesado | A revisión | Precisión sobre lo auto |
+| Threshold | Auto-processed | To review | Accuracy on the auto-processed |
 |---:|---:|---:|---:|
-| 0,00 – 0,80 | 100% | 0% | 83,5% |
-| 0,85 | 97% | 3% | 83,9% |
-| 0,95 | 90% | 10% | 85,1% |
-| **1,00** | **56%** | **44%** | **91,0%** |
+| 0.00 – 0.80 | 100% | 0% | 83.5% |
+| 0.85 | 97% | 3% | 83.9% |
+| 0.95 | 90% | 10% | 85.1% |
+| **1.00** | **56%** | **44%** | **91.0%** |
 
-El modelo se declara con confianza ≥ 0,85 en el 97% de los documentos: la escala
-está colapsada y lo único que informa es el corte entre `1,00` y el resto.
+The model declares confidence ≥ 0.85 on 97% of documents: the scale is collapsed,
+and the only informative cut is `1.00` against everything else.
 
-**Rutear por formato es mejor y es gratis.** El formato se conoce antes de llamar
-al modelo: auto-procesar COMPR.AR da el 50% del corpus al 93,5%, contra el 56% al
-91,0% que da el umbral de confianza. Más precisión, sin pagar la llamada para
-enterarse. **Esa es la conclusión operativa del proyecto, y contradice lo que yo
-esperaba encontrar cuando escribí la curva.**
+**Routing by format is better and free.** The format is known before the model is
+called: auto-processing COMPR.AR notices covers 50% of the corpus at 93.5%,
+against 56% at 91.0% from the confidence threshold. More accuracy, without paying
+for a call to find out. **That is the project's operational conclusion, and it
+contradicts what I expected to find when I wrote the threshold curve.**
 
-## Arquitectura
+## Architecture
 
 ```
-Boletines diarios (data/raw/*.pdf)   ~68 avisos por edición
+Daily gazettes (data/raw/*.pdf)      ~68 notices per edition
    │
-   ├─ src/dividir.py ──────────► un .txt por aviso (data/interim/*.txt)
-   │                              + data/interim/indice.json con rubro,
-   │                                tipo (llamado/adjudicación) y formato
+   ├─ src/dividir.py ──────────► one .txt per notice (data/interim/*.txt)
+   │                              + data/interim/indice.json with category,
+   │                                type (call / award) and format
    │
-   ├─ label/etiquetar.py ──────► set de referencia (data/gold/etiquetas.jsonl)
-   │                              etiquetado a mano, protocolo versionado
+   ├─ label/etiquetar.py ──────► reference set (data/gold/etiquetas.jsonl)
+   │                              hand-labeled, versioned protocol
    │
-   ├─ src/extraer.py ──────────► predicciones por variante
-   │      │                       (data/interim/pred_<variante>.jsonl)
-   │      └─ src/proveedores.py   capa única sobre anthropic / openai / google / mock
-   │         src/variantes.py     las combinaciones que se comparan
-   │         src/esquema.py       el contrato: campos, tipos, pesos, JSON Schema
+   ├─ src/extraer.py ──────────► predictions per variant
+   │      │                       (data/interim/pred_<variant>.jsonl)
+   │      └─ src/proveedores.py   one layer over anthropic / openai / google / mock
+   │         src/variantes.py     the combinations being compared
+   │         src/esquema.py       the contract: fields, types, weights, JSON Schema
    │
-   ├─ src/evaluar.py ──────────► métricas (reports/metricas.json)
-   │      └─ src/normalizar.py    comparación por valor canónico, no por string
+   ├─ src/evaluar.py ──────────► metrics (reports/metricas.json)
+   │      └─ src/normalizar.py    comparison by canonical value, not by string
    │
    └─ src/reporte.py ──────────► reports/RESULTADOS.md
 ```
 
-## Cómo correrlo
+## Running it
 
 ```bash
-python -m venv .venv && source .venv/bin/activate   # en Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 1. Probá el pipeline entero sin gastar un peso ni tener API key.
-python src/dividir.py                # boletines diarios -> un .txt por aviso
-python label/etiquetar.py            # etiquetá 3 o 4 para probar
+# 1. Exercise the whole pipeline without spending a cent or having an API key.
+python src/dividir.py                # daily gazettes -> one .txt per notice
+python label/etiquetar.py            # label 3 or 4 just to try it
 python src/extraer.py --variante v0-base
 python src/evaluar.py
 python src/reporte.py
 
-# 2. Recién ahí, con el pipeline verificado, poné la API key y corré en serio.
-cp .env.example .env                 # completá la clave del proveedor que uses
-# completá los nombres de modelo en src/variantes.py
-# completá los precios en config/precios.json
+# 2. Only then, with the pipeline verified, add the API key and run for real.
+cp .env.example .env                 # fill in the key for the provider you use
+# fill in the model names in src/variantes.py
+# fill in the prices in config/precios.json
 python src/extraer.py --todas
 python src/evaluar.py && python src/reporte.py
 ```
 
-## De dónde salen los datos
+## Where the data comes from
 
-Avisos de la Tercera Sección (Contrataciones) del
+Notices from Section Three (Procurement) of the
 [Boletín Oficial de la República Argentina](https://www.boletinoficial.gob.ar/).
-Cada edición diaria es un solo PDF con todos los avisos del día adentro —
-alrededor de 68 en la edición del 3/8/2026— así que el corpus se arma bajando
-unas 5 ediciones, no 300 archivos.
+Each daily edition is a single PDF containing every notice of the day — about 68
+in the 2026-08-03 edition — so the corpus is built by downloading roughly 5
+editions, not 300 files.
 
-Los PDFs no están versionados en el repo (`data/raw/` está en `.gitignore`): son
-pesados y se pueden volver a bajar. Lo que sí está versionado es el set etiquetado,
-que es el activo real del proyecto.
+The PDFs are not versioned in the repo (`data/raw/` is in `.gitignore`): they are
+heavy and can be downloaded again. What **is** versioned is the labeled set,
+which is the project's real asset.
 
-Descarga: 5 ediciones de la Tercera Sección — **1/6, 19/6, 1/7, 20/7 y 3/8 de
-2026**— bajadas a mano desde el sitio del Boletín Oficial. Dieron **300 avisos en
-bruto y 296 únicos**, de los cuales **267 son llamados** (el resto,
-adjudicaciones y preadjudicaciones, quedan fuera del set).
+Downloaded: 5 editions of Section Three — **2026-06-01, 06-19, 07-01, 07-20 and
+08-03** — pulled by hand from the Gazette's site. They yielded **300 raw notices
+and 296 unique ones**, of which **267 are calls for bids** (the rest are awards
+and preliminary awards, which stay out of the set).
 
-### Por qué las fechas están espaciadas
+### Why the dates are spaced out
 
-Un aviso no se publica un día: se publica durante varios días seguidos, y el pie
-lo dice (`e. 31/07/2026 ... v. 03/08/2026`). Un primer intento con **cinco
-ediciones consecutivas** dio 304 avisos de los cuales **el 38% eran
-republicaciones del mismo aviso**. Sin deduplicar, el modelo habría visto el
-mismo documento hasta cuatro veces y cada acierto o error se habría contado de
-nuevo: la precisión reportada habría estado inflada.
+A notice is not published on one day: it runs for several consecutive days, and
+its footer says so (`e. 31/07/2026 ... v. 03/08/2026`). A first attempt with
+**five consecutive editions** produced 304 notices, of which **38% were
+republications of the same notice**. Without deduplication the model would have
+seen the same document up to four times and every hit or miss would have been
+counted again: the reported accuracy would have been inflated.
 
-Con **fechas espaciadas** el solapamiento cayó al **1%**. `src/dividir.py`
-deduplica igual por número de aviso, pero el diseño del muestreo es lo que hace
-que el corpus sea realmente diverso y no cinco fotos del mismo día.
+With **spaced-out dates** the overlap dropped to **1%**. `src/dividir.py`
+deduplicates by notice number anyway, but the sampling design is what makes the
+corpus genuinely diverse instead of five photographs of the same day.
 
-### Cómo se corta cada edición
+### How each edition is split
 
-Cada aviso termina con su pie de publicación —
-`e. 31/07/2026 N° 53047/26 v. 03/08/2026`— que aparece exactamente una vez por
-aviso y trae su identificador. Ese pie es el delimitador. `src/dividir.py` además
-clasifica cada aviso por rubro, por tipo (llamado / preadjudicación / adjudicación)
-y por formato:
+Every notice ends with its publication footer —
+`e. 31/07/2026 N° 53047/26 v. 03/08/2026` — which appears exactly once per notice
+and carries its identifier. That footer is the delimiter. `src/dividir.py` also
+classifies every notice by category, by type (call / preliminary award / award)
+and by format:
 
-- **`comprar`**: los que publica el sistema COMPR.AR, con campos etiquetados
-  (`UOC:`, `Expediente N°:`, `Objeto:`). Homogéneos y fáciles.
-- **`libre`**: los que cada organismo redacta a su manera —universidades, BCRA,
-  Ministerio Público, banca multilateral—. Prosa corrida, campos en mayúsculas o
-  directamente ausentes.
+- **`comprar`**: the ones published through the COMPR.AR system, with labeled
+  fields (`UOC:`, `Expediente N°:`, `Objeto:`). Homogeneous and easy.
+- **`libre`**: the ones each agency writes its own way — universities, the
+  central bank, the public prosecutor's office, multilateral lenders. Running
+  prose, fields in all caps or simply absent.
 
-Esa distinción importa: reportar el resultado por segmento dice mucho más que un
-promedio único. **93,5% en formato COMPR.AR contra 73,2% en formato libre** es un
-hallazgo; el 83,5% promedio de los dos esconde justamente dónde falla.
+That distinction matters: reporting the result per segment says far more than a
+single average. **93.5% on COMPR.AR format against 73.2% on free-form** is a
+finding; the 83.5% average of the two hides exactly where it fails.
 
-Y la distinción no es sólo del modelo: el techo humano también se parte, 98,7%
-contra 72,7%. **Los dos lados de la grieta aparecen en las dos mediciones
-independientes**, lo que dice que la variable es el documento y no el extractor.
+And the distinction is not only the model's: the human ceiling splits too, 98.7%
+against 72.7%. **Both sides of the crack show up in two independent
+measurements**, which says the variable is the document and not the extractor.
 
-## Lo que no resuelve
+## What this does not solve
 
-- **Adjudicaciones y preadjudicaciones** (29 de los 296 avisos del corpus) quedan
-  fuera. Son avisos de *resultado*, no de convocatoria: no tienen fecha de
-  apertura ni valor de pliego, y la mitad del esquema no les aplica. Meterlas
-  mezclaría dos tareas de extracción distintas bajo una sola métrica. Extraer de
-  ellas es un proyecto aparte, con su propio esquema.
-- **PDFs escaneados sin capa de texto.** Las cinco ediciones de este corpus traen
-  texto, pero si apareciera una escaneada `src/dividir.py` la detecta y avisa.
-  Requeriría OCR y un experimento aparte: mezclarlos confunde el error del modelo
-  con el error del OCR.
-- **Avisos de más de 60.000 caracteres.** `src/extraer.py` los corta. Ninguno del
-  corpus actual se acerca (el más largo tiene 4.220), pero el límite existe y hay
-  que declararlo.
-- **El techo lo midió la misma persona dos veces.** Es consistencia propia, no
-  acuerdo entre anotadores: está sesgado hacia arriba, porque una persona repite
-  sus propios criterios —y sus propios malentendidos— mejor de lo que dos
-  personas coinciden. Un segundo anotador bajaría el techo, y con eso cambiaría
-  la lectura de "el modelo está en el techo" a "el modelo está por encima de lo
-  que una persona sola logra reproducir". **No está medido y no se afirma.**
-- **El efecto del modelo está medido sobre 61 documentos, no sobre 115.** La capa
-  gratuita permite 20 pedidos por día a ese modelo, así que la comparación se
-  hizo sobre la intersección donde todas las variantes tienen extracción válida.
-  Es una comparación **válida** —misma prueba para todas— pero con la mitad de la
-  muestra: el intervalo es más ancho de lo que sugiere un número con un decimal,
-  y la cobertura completa queda sin medir.
-- **El 429 llegó atribuido a `gemini-3.6-flash` y `variantes.py` pide
-  `gemini-3.5-flash`.** El proveedor enruta a otro modelo y las predicciones
-  guardan el modelo que se **pidió**, no el que **contestó**. Es el capítulo
-  siguiente de la lección que ya está más arriba: no sólo caducan los
-  identificadores — el proveedor puede contestar con otro modelo, y si no se
-  registra cuál, no se puede saber. **Eso vuelve provisorio el "efecto del
-  modelo":** si las dos variantes corrieron en el mismo modelo, lo medido no es
-  el efecto del modelo. Anotado en `docs/PENDIENTES.md`.
-- **Una etiqueta del set de oro estaba mal y la encontró un modelo**, no yo: el
-  aviso `44538-26` decía apertura el 13/07 y yo había tipeado 3/07. Apareció
-  desde el [proyecto 02](https://github.com/enzoestevez/conciliador-contrataciones)
-  al cruzar contra el registro oficial. Corregida y registrada en
-  [`docs/CORRECCIONES.md`](docs/CORRECCIONES.md). **Auditados los avisos con
-  bloque legible: 1 etiqueta mal, 0 extracciones del modelo mal sobre 29.** Si
-  hay un error en 29 campos auditables, es razonable suponer que hay otros en los
-  que no se pudieron auditar.
-- **La confianza del modelo no se puede usar para rutear**, como muestra la curva
-  de umbral. El proyecto se planteaba encontrar el umbral óptimo y lo que
-  encontró es que esa palanca casi no existe en este modelo. Es un resultado
-  negativo y se informa igual.
+- **Awards and preliminary awards** (29 of the corpus's 296 notices) are out of
+  scope. They are *outcome* notices, not calls: they have no opening date and no
+  price for the bidding documents, and half the schema does not apply. Including
+  them would mix two different extraction tasks under one metric. Extracting from
+  them is a separate project with its own schema.
+- **Scanned PDFs with no text layer.** The five editions in this corpus carry
+  text, but if a scanned one appeared `src/dividir.py` detects it and says so. It
+  would need OCR and a separate experiment: mixing them confuses the model's error
+  with the OCR's error.
+- **Notices longer than 60,000 characters.** `src/extraer.py` truncates them. None
+  in the current corpus comes close (the longest is 4,220), but the limit exists
+  and has to be declared.
+- **The ceiling was measured by the same person twice.** That is self-consistency,
+  not inter-annotator agreement: it is biased upward, because one person
+  reproduces their own criteria — and their own misunderstandings — better than
+  two people agree. A second annotator would lower the ceiling, and that would
+  change the reading from "the model is at the ceiling" to "the model is above
+  what one person alone can reproduce." **It is not measured, so it is not
+  claimed.**
+- **The model effect is measured over 61 documents, not 115.** The free tier
+  allows 20 requests per day on that model, so the comparison was made over the
+  intersection where every variant has a valid extraction. It is a **valid**
+  comparison — the same test for all of them — but with half the sample: the
+  interval is wider than a number with one decimal suggests, and full coverage
+  stays unmeasured.
+- **The 429 arrived attributed to `gemini-3.6-flash` while `variantes.py` asks for
+  `gemini-3.5-flash`.** The provider routes to a different model and the
+  predictions store the model that was **requested**, not the one that
+  **answered**. This is the next chapter of the lesson already noted above: model
+  identifiers do not just expire — the provider can answer with a different
+  model, and if you do not record which one, you cannot know. **That makes the
+  "model effect" provisional:** if both variants ran on the same model, what was
+  measured is not the model effect. Logged in `docs/PENDIENTES.md`.
+- **One label in the gold set was wrong, and a model found it**, not me: notice
+  `44538-26` states an opening date of 2026-07-13 and I had typed 07-03. It
+  surfaced from [project 02](https://github.com/enzoestevez/conciliador-contrataciones)
+  while cross-checking against the official registry. Corrected and logged in
+  [`docs/CORRECCIONES.md`](docs/CORRECCIONES.md). **Auditing the notices with a
+  machine-readable block: 1 wrong label, 0 wrong model extractions out of 29.**
+  If there is one error in 29 auditable fields, it is reasonable to assume there
+  are others among the ones that could not be audited.
+- **The model's confidence cannot be used for routing**, as the threshold curve
+  shows. The project set out to find the optimal threshold and what it found is
+  that the lever barely exists in this model. It is a negative result and it is
+  reported anyway.
 
-## Consistencia del propio set de referencia
+## Consistency of the reference set itself
 
-Doble etiquetado ciego de 20 documentos, estratificado por formato, sin ver las
-respuestas anteriores y cronometrado: **85,7% de coincidencia conmigo mismo.**
-Ese es el techo de este experimento — ningún modelo puede superar la consistencia
-de la verdad de referencia contra la que se lo mide.
+Blind double-labeling of 20 documents, stratified by format, without seeing the
+previous answers, and timed: **85.7% agreement with myself.** That is the ceiling
+of this experiment — no model can beat the consistency of the ground truth it is
+scored against.
 
-**Y el techo se parte igual que todo lo demás:**
+**And the ceiling splits like everything else:**
 
-| | Techo humano |
+| | Human ceiling |
 |---|---:|
-| Formato COMPR.AR | **98,7%** |
-| Formato libre | **72,7%** |
+| COMPR.AR format | **98.7%** |
+| Free-form | **72.7%** |
 
-Ese desglose es el hallazgo más importante del proyecto. Un modelo al 73% en
-formato libre no está fallando: está en el límite de lo que el documento permite
-decidir sin información que no está escrita. Reportar "73%" sin el techo al lado
-invita a la conclusión equivocada, que es gastar en un modelo mejor.
+That breakdown is the project's most important finding. A model at 73% on
+free-form notices is not failing: it is at the limit of what the document allows
+anyone to decide without information that is not written down. Reporting "73%"
+without the ceiling next to it invites the wrong conclusion, which is to spend on
+a better model.
 
-**Lo que el control ciego detectó además del número:**
+**What the blind control caught besides the number:**
 
-1. **El sesgo de anclaje, medido y no supuesto.** La pasada asistida aceptaba la
-   sobre-captura del parser en `organismo` donde la pasada ciega acertaba. El
-   control encontró un error sistemático de la propia metodología.
-2. **Dos reglas faltantes del protocolo.** Al escribirlas y aplicarlas, el techo
-   subió de 79,7% a 85,7% y los documentos idénticos entre pasadas de 10% a 35%.
-   Buena parte de lo que parecía inconsistencia humana era protocolo incompleto.
-3. **El tiempo humano real:** 113 segundos por documento (mediana). El promedio
-   de 222 s se descarta: un documento se llevó 1.080 s y arrastra el promedio.
-   Reportar la media habría inflado el ahorro del modelo al doble.
+1. **Anchoring bias, measured rather than assumed.** The assisted pass accepted
+   the parser's over-capture on `organismo` where the blind pass got it right.
+   The control found a systematic error in the methodology itself.
+2. **Two missing rules in the protocol.** Writing them down and applying them
+   raised the ceiling from 79.7% to 85.7% and the share of identical documents
+   between passes from 10% to 35%. A good part of what looked like human
+   inconsistency was an incomplete protocol.
+3. **The real human time:** 113 seconds per document (median). The 222 s mean is
+   discarded: one document took 1,080 s and drags the mean. Reporting the mean
+   would have inflated the model's saving by a factor of two.
 
-## Decisiones que tomé y por qué
+## Decisions I made, and why
 
-- **La hora cuenta en `fecha_apertura`.** En una apertura de ofertas, equivocarse
-  de hora es equivocarse. Si el caso de uso no la necesitara, cambiaría el
-  normalizador — pero sería un supuesto distinto y habría que declararlo.
-- **`valor_pliego` distingue `0` de `null`.** "El pliego es gratuito" y "el aviso
-  no menciona el pliego" son hechos distintos. Meterlos en la misma bolsa
-  entrenaría al sistema a rellenar huecos.
-- **`monto_estimado` bajó de peso 2.0 a 0.5** después de medir la cobertura sobre
-  los 267 llamados: sólo el 15% de los avisos trae monto, así que en el 85% de
-  los casos la respuesta correcta es `null`. Con peso 2.0, un modelo que
-  contestara `null` siempre ganaba en el campo más pesado del esquema — o sea que
-  ese campo medía prudencia, no capacidad de extracción. Lo que sí mide bien es la
-  alucinación, y eso se reporta en su propia línea.
-- **Los pesos salen de una tabla de cobertura medida**, no de una intuición. Está
-  en el encabezado de `src/esquema.py` con el método para reproducirla.
-- **El corpus se muestrea con fechas espaciadas**, por la republicación de avisos.
-  Ver arriba: es la diferencia entre 38% y 1% de duplicados.
-- **La línea base no es un modelo barato: es un parser sin IA.** `v0-reglas`
-  extrae con expresiones regulares, a costo cero y latencia despreciable. Ubica
-  los campos estructurales en el **95%** de los avisos de formato COMPR.AR y en
-  el **51%** de los de formato libre. Cualquier modelo tiene que justificar su
-  costo contra esa vara, y sólo en el segmento donde la diferencia existe. La
-  pregunta del proyecto deja de ser "qué modelo anda mejor" y pasa a ser **dónde
-  se justifica pagar por un modelo**.
-- **Nunca un promedio único.** Cada número va con su `n` y partido por formato,
-  al lado de su propio techo. El 83,5% global es cierto y no sirve para decidir
-  nada.
-- **La variante ganadora se elige sólo entre las que tienen cobertura completa.**
-  La tabla llegó a coronar a `v4-modelo-caro` con 83,9% sobre 53 documentos
-  contra `v3-ejemplos` con 83,5% sobre 115. No es la misma prueba, así que esos
-  0,4 puntos no significaban nada. El dato estaba en `metricas.json`
-  (`n_documentos: 53`, `errores_llamada: 62`) y el reporte no lo mostraba, **que
-  es peor que no tenerlo**. Ahora la columna `n` está en la tabla, las variantes
-  incompletas quedan marcadas, y si ninguna tiene cobertura completa el reporte
-  se niega a generarse.
-- **Rutear por formato, no por la confianza del modelo.** Es más preciso, se sabe
-  antes de llamar al modelo y sale gratis. Lo encontré buscando lo contrario.
-- **Un número demasiado limpio se investiga antes de publicarlo.** Esta regla
-  salió del proyecto 02, donde un "cero discrepancias" resultó ser seis bugs
-  propios, y se aplica para atrás: por eso `v4` se marca en vez de celebrarse.
+- **The time of day counts in `fecha_apertura`.** At a bid opening, getting the
+  hour wrong is getting it wrong. If the use case did not need it I would change
+  the normalizer — but that would be a different assumption and it would have to
+  be declared.
+- **`valor_pliego` distinguishes `0` from `null`.** "The bidding documents are
+  free" and "the notice does not mention them" are different facts. Putting them
+  in the same bucket would train the system to fill in gaps.
+- **`monto_estimado` dropped in weight from 2.0 to 0.5** after measuring coverage
+  across the 267 calls: only 15% of notices carry an amount, so in 85% of cases
+  the correct answer is `null`. At weight 2.0, a model that always answered `null`
+  won on the heaviest field in the schema — meaning that field measured prudence,
+  not extraction ability. What it does measure well is hallucination, and that is
+  reported on its own line.
+- **The weights come from a measured coverage table**, not from intuition. It is
+  in the header of `src/esquema.py` along with the method to reproduce it.
+- **The corpus is sampled with spaced-out dates**, because of notice
+  republication. See above: it is the difference between 38% and 1% duplicates.
+- **The baseline is not a cheap model: it is a parser with no AI.** `v0-reglas`
+  extracts with regular expressions, at zero cost and negligible latency. It
+  locates the structural fields in **95%** of COMPR.AR notices and **51%** of
+  free-form ones. Any model has to justify its cost against that yardstick, and
+  only in the segment where the difference exists. The project's question stops
+  being "which model performs better" and becomes **where paying for a model is
+  justified**.
+- **Never a single average.** Every number comes with its `n` and split by
+  format, next to its own ceiling. The global 83.5% is true and useless for
+  deciding anything.
+- **The winning variant is picked only among those with complete coverage.** The
+  table once crowned `v4-modelo-caro` at 83.9% over 53 documents against
+  `v3-ejemplos` at 83.5% over 115. Not the same test, so those 0.4 points meant
+  nothing. The data was right there in `metricas.json` (`n_documentos: 53`,
+  `errores_llamada: 62`) and the report did not show it, **which is worse than
+  not having it**. Now the `n` column is in the table, incomplete variants are
+  flagged, and if none has complete coverage the report refuses to generate.
+- **Route by format, not by the model's confidence.** It is more accurate, it is
+  known before the model is called, and it is free. I found it while looking for
+  the opposite.
+- **A number that looks too clean gets investigated before it gets published.**
+  This rule came out of project 02, where a "zero discrepancies" result turned out
+  to be six bugs of my own, and it applies backwards: that is why `v4` is flagged
+  instead of celebrated.
+
+---
+
+## The chain
+
+This is part 1 of three projects where **each one builds the instrument that
+measures the next**, so no ground truth anywhere in the chain is generated by a
+model.
+
+| | Project | What it is for the next one |
+|---|---|---|
+| **1** | **this one** — evaluation harness | the oracle for project 2 |
+| 2 | [conciliador-contrataciones](https://github.com/enzoestevez/conciliador-contrataciones) — verification agent | the system under test for project 3 |
+| 3 | [auditoria-adversarial-agente](https://github.com/enzoestevez/auditoria-adversarial-agente) — adversarial audit | the reproducibility check that validated project 2 |
+
+And the traffic runs both ways: project 2's model found the typo in this
+project's gold set, and project 3 found that project 2's deterministic oracle is
+more vulnerable to input variation than the model-based agent it validates.
